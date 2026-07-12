@@ -1,17 +1,12 @@
-import Pulse from "@/components/Pulse";
+import Site from "@/components/site/Site";
+import { getCaseStudies } from "@/lib/queries";
+import { mapCases } from "@/components/site/caseData";
 
-export default function HomePage() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-10 px-6">
-      <Pulse />
-      <div className="text-center">
-        <p className="font-display text-xs tracking-widest2 text-crust/70">
-          BREADMAN
-        </p>
-        <p className="mt-1 text-[11px] text-crust/45">
-          Diseño, web y motion. Valle del Aconcagua, Chile.
-        </p>
-      </div>
-    </main>
-  );
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const raw = await getCaseStudies();
+  const cases = mapCases(raw);
+
+  return <Site cases={cases} />;
 }

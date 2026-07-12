@@ -2,6 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #101010;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #5f7884;
+}
+
+.contact-input {
+  background: none;
+  border: 1px solid rgba(137, 158, 170, 0.55);
+  border-radius: 12px;
+  padding: 14px 22px;
+  font-family: inherit;
+  font-size: 15px;
+  color: #b7d0de;
+  outline: none;
+}
+
+.mobile-input {
+  background: none;
+  border: 1px solid #5f7884;
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #b7d0de;
+  outline: none;
+}
+
+@keyframes bmHomeBg {
+  0% {
+    background-color: #732706;
+  }
+  20% {
+    background-color: #5f7884;
+  }
+  40% {
+    background-color: #6f4b52;
+  }
+  60% {
+    background-color: #283035;
+  }
+  80% {
+    background-color: #b65534;
+  }
+  100% {
+    background-color: #732706;
+  }
+}
+
+@keyframes bmBtnPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes bmPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes bmSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.bm-btn-pulse {
+  animation: bmBtnPulse 500ms ease-in-out;
 }

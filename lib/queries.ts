@@ -9,6 +9,10 @@ export async function getCaseStudies() {
       tags,
       summary,
       coverImage,
+      backgroundDesktop,
+      backgroundMobile,
+      "audioFileUrl": audioFile.asset->url,
+      audioEmbedUrl,
       externalUrl,
       featured
     }

@@ -16,7 +16,8 @@
     "next-sanity": "^9.4.0",
     "@sanity/vision": "^3.57.0",
     "@sanity/image-url": "^1.0.2",
-    "styled-components": "^6.1.11"
+    "styled-components": "^6.1.11",
+    "@anthropic-ai/sdk": "^0.68.0"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

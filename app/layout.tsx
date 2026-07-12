@@ -23,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={`${jetbrainsMono.variable} font-mono antialiased`}>
+      <body className={`${jetbrainsMono.variable} font-mono antialiased`} style={{ margin: 0 }}>
         {children}
       </body>
     </html>

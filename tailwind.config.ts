@@ -36,8 +36,8 @@ const config: Config = {
       },
       keyframes: {
         "pulse-slow": {
-          "0%, 100%": { transform: "scale(1)", opacity: "0.9" },
-          "50%": { transform: "scale(1.03)", opacity: "1" },
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.03)" },
         },
         "home-bg": {
           "0%, 100%": { backgroundColor: "#732706" },
@@ -46,10 +46,19 @@ const config: Config = {
           "60%": { backgroundColor: "#283035" },
           "80%": { backgroundColor: "#B65534" },
         },
+        "btn-pulse": {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(0.95)" },
+        },
+        "spin-slow": {
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
-        "pulse-slow": "pulse-slow 1s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 1000ms ease-in-out infinite",
         "home-bg": "home-bg 60s ease-in-out infinite",
+        "btn-pulse": "btn-pulse 500ms ease-in-out",
+        "spin-slow": "spin-slow 16000ms linear infinite",
       },
     },
   },
