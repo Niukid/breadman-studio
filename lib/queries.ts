@@ -2,15 +2,13 @@ import { client } from "@/sanity/client";
 
 export async function getCaseStudies() {
   return client.fetch(`
-    *[_type == "caseStudy"] | order(order asc) {
+    *[_type == "caseStudy"] | order(orderRank asc) {
       _id,
       title,
       slug,
       tags,
       summary,
       coverImage,
-      backgroundDesktop,
-      backgroundMobile,
       "audioFileUrl": audioFile.asset->url,
       audioEmbedUrl,
       externalUrl,

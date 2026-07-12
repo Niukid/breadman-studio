@@ -1,10 +1,13 @@
 import { defineField, defineType } from "sanity";
+import { orderRankField, orderRankOrdering } from "@sanity/orderable-document-list";
 
 export default defineType({
   name: "caseStudy",
   title: "Caso de portafolio",
   type: "document",
+  orderings: [orderRankOrdering],
   fields: [
+    orderRankField({ type: "caseStudy" }),
     defineField({
       name: "title",
       title: "Nombre del proyecto",
@@ -100,12 +103,6 @@ export default defineType({
       title: "Link externo (ej. NIUKID, Claroscuro Records)",
       description: "Déjalo vacío si el caso no lleva a un sitio propio",
       type: "url",
-    }),
-    defineField({
-      name: "order",
-      title: "Orden en el portafolio",
-      description: "Número menor aparece primero",
-      type: "number",
     }),
     defineField({
       name: "featured",

@@ -10,8 +10,6 @@ export type SiteCase = {
   url: string;
   audioUrl: string;
   imageUrl: string;
-  bgImageDesktopUrl: string;
-  bgImageMobileUrl: string;
 };
 
 const tagLabels: Record<string, string> = {
@@ -33,16 +31,6 @@ export function mapCases(raw: any[]): SiteCase[] {
       url: c.externalUrl || "#",
       audioUrl: c.audioFileUrl || c.audioEmbedUrl || "",
       imageUrl: c.coverImage ? urlFor(c.coverImage).width(900).height(680).url() : "",
-      bgImageDesktopUrl: c.backgroundDesktop
-        ? urlFor(c.backgroundDesktop).width(1600).url()
-        : c.coverImage
-          ? urlFor(c.coverImage).width(1600).url()
-          : "",
-      bgImageMobileUrl: c.backgroundMobile
-        ? urlFor(c.backgroundMobile).width(900).url()
-        : c.coverImage
-          ? urlFor(c.coverImage).width(900).url()
-          : "",
     };
   });
 }

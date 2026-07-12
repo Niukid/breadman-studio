@@ -546,10 +546,6 @@ function CaseOverlay({
       className="absolute inset-0 z-[60] bg-[#101010]"
       style={{ opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity 500ms ease" }}
     >
-      {c.bgImageDesktopUrl && (
-        <img src={c.bgImageDesktopUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
-      )}
-      <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(16,16,16,.6)" }} />
       <div
         className="no-scrollbar absolute inset-0 m-auto flex flex-col overflow-y-auto"
         style={{ width: "min(1440px,100%)", height: "min(800px,100%)", padding: "0 56px" }}
