@@ -483,11 +483,11 @@ function FilterPill({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className="bg-transparent cursor-pointer rounded-full font-mono text-[15px]"
+      className="bg-transparent cursor-pointer rounded-[10px] font-mono text-[13px]"
       style={{
         color: "#C9DCE6",
         border: `1px solid rgba(201,220,230,${active ? 1 : 0.55})`,
-        padding: "11px 28px",
+        padding: "8px 18px",
         transition: "background 250ms ease, color 250ms ease, border-color 250ms ease",
       }}
     >
@@ -504,11 +504,11 @@ function CaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
       {...handlers}
       className="rounded-2xl flex flex-col justify-end p-6 cursor-pointer"
       style={{
-        background: hovered ? "#2C3841" : "#263038",
+        backgroundColor: hovered ? "#2C3841" : "#263038",
         aspectRatio: "1.85",
         transform: hovered ? "translateY(-5px)" : "none",
-        transition: "transform 300ms ease, background 300ms ease",
-        backgroundImage: c.imageUrl ? `linear-gradient(rgba(16,16,16,.35), rgba(16,16,16,.55)), url(${c.imageUrl})` : undefined,
+        transition: "transform 300ms ease, background-color 300ms ease",
+        backgroundImage: c.imageUrl ? `linear-gradient(rgba(16,16,16,.2), rgba(16,16,16,.45)), url(${c.imageUrl})` : undefined,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -546,6 +546,16 @@ function CaseOverlay({
       className="absolute inset-0 z-[60] bg-[#101010]"
       style={{ opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity 500ms ease" }}
     >
+      {c.bgImageDesktopUrl && (
+        <img
+          src={c.bgImageDesktopUrl}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: "brightness(.8)" }}
+        />
+      )}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(16,16,16,.6)" }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,.2)" }} />
       <div
         className="no-scrollbar absolute inset-0 m-auto flex flex-col overflow-y-auto"
         style={{ width: "min(1440px,100%)", height: "min(800px,100%)", padding: "0 56px" }}
@@ -560,44 +570,43 @@ function CaseOverlay({
             </svg>
           </button>
         </div>
-        <div className="relative flex-1 rounded-[18px] overflow-hidden m-0" style={{ minHeight: 170 }}>
-          {c.imageUrl && <img src={c.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />}
-        </div>
-        <div className="relative pt-6" style={{ maxWidth: 920 }}>
-          <h1 className="italic font-extralight m-0" style={{ color: "#C9D6DE", fontSize: 44, lineHeight: 1.05 }}>
-            {c.title}
-          </h1>
-          <div className="my-5" style={{ color: "rgba(201,214,222,.6)", fontSize: 15 }}>
-            {c.tagsLabel}
-          </div>
-          <div className="mb-[30px]" style={{ color: "rgba(201,214,222,.85)", fontSize: 16, lineHeight: 1.6 }}>
-            {c.desc}
-          </div>
-          {c.audioUrl && (
-            <div className="rounded-[14px] p-5 mb-8" style={{ border: "1px solid rgba(201,214,222,.4)", maxWidth: 520 }}>
-              <div className="mb-[13px] text-[10px]" style={{ color: "rgba(201,214,222,.55)", letterSpacing: ".16em" }}>
-                DISEÑO SONORO
-              </div>
-              <div className="flex items-center gap-4">
-                <PlayButton audio={audio} accent="#C9D6DE" />
-                <div className="flex-1 min-w-0">
-                  <div
-                    onClick={audio.seek}
-                    className="h-1.5 rounded-full cursor-pointer overflow-hidden"
-                    style={{ background: "rgba(201,214,222,.22)" }}
-                  >
-                    <div className="h-full" style={{ width: `${audio.pct}%`, background: "#C9D6DE" }} />
-                  </div>
-                  <div className="flex justify-between mt-2 text-[11px]" style={{ color: "rgba(201,214,222,.5)" }}>
-                    <span>{audio.curLabel}</span>
-                    <span>{audio.durLabel}</span>
+        <div className="flex-1 min-h-0 flex flex-col justify-end">
+          <div className="relative" style={{ maxWidth: 920 }}>
+            <h1 className="italic font-extralight m-0" style={{ color: "#C9D6DE", fontSize: 44, lineHeight: 1.05 }}>
+              {c.title}
+            </h1>
+            <div className="my-5" style={{ color: "rgba(201,214,222,.6)", fontSize: 15 }}>
+              {c.tagsLabel}
+            </div>
+            <div className="mb-[30px]" style={{ color: "rgba(201,214,222,.85)", fontSize: 16, lineHeight: 1.6 }}>
+              {c.desc}
+            </div>
+            {c.audioUrl && (
+              <div className="rounded-[14px] p-5 mb-8" style={{ border: "1px solid rgba(201,214,222,.4)", maxWidth: 520 }}>
+                <div className="mb-[13px] text-[10px]" style={{ color: "rgba(201,214,222,.55)", letterSpacing: ".16em" }}>
+                  DISEÑO SONORO
+                </div>
+                <div className="flex items-center gap-4">
+                  <PlayButton audio={audio} accent="#C9D6DE" />
+                  <div className="flex-1 min-w-0">
+                    <div
+                      onClick={audio.seek}
+                      className="h-1.5 rounded-full cursor-pointer overflow-hidden"
+                      style={{ background: "rgba(201,214,222,.22)" }}
+                    >
+                      <div className="h-full" style={{ width: `${audio.pct}%`, background: "#C9D6DE" }} />
+                    </div>
+                    <div className="flex justify-between mt-2 text-[11px]" style={{ color: "rgba(201,214,222,.5)" }}>
+                      <span>{audio.curLabel}</span>
+                      <span>{audio.durLabel}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-          <audio ref={audio.audioRef} preload="metadata" className="hidden" />
-          <VisitSiteLink href={c.url} accent="#C9D6DE" onDark="#101010" />
+            )}
+            <audio ref={audio.audioRef} preload="metadata" className="hidden" />
+            {c.url && <VisitSiteLink href={c.url} accent="#C9D6DE" onDark="#101010" />}
+          </div>
         </div>
         <div className="flex justify-between items-center py-[18px] flex-none" style={{ paddingBottom: 22 }}>
           <div className="text-[13px]" style={{ color: "rgba(201,214,222,.5)" }}>

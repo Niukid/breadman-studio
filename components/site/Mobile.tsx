@@ -309,7 +309,7 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
           </Reveal>
           <Reveal i={2} className="flex gap-2.5 flex-wrap mb-11">
             {["Todo", "Branding", "Web", "Audio"].map((f) => (
-              <span key={f} className="rounded-full text-[13px]" style={{ border: "1px solid #B7D0DE", color: "#B7D0DE", padding: "7px 18px" }}>
+              <span key={f} className="rounded-[10px] text-[11px]" style={{ border: "1px solid #B7D0DE", color: "#B7D0DE", padding: "5px 12px" }}>
                 {f}
               </span>
             ))}
@@ -508,29 +508,22 @@ function MobileCaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
       onClick={onOpen}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
-      className="rounded-2xl cursor-pointer overflow-hidden"
+      className="rounded-2xl flex flex-col justify-end p-6 cursor-pointer"
       style={{
-        background: "rgba(16,16,16,0.16)",
-        paddingBottom: 26,
+        backgroundColor: "#263038",
+        aspectRatio: "1.3",
         transform: pressed ? "scale(0.98)" : "none",
         transition: "transform 250ms ease",
+        backgroundImage: c.imageUrl ? `linear-gradient(rgba(16,16,16,.2), rgba(16,16,16,.45)), url(${c.imageUrl})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
       }}
     >
-      <div
-        className="h-[250px]"
-        style={
-          c.imageUrl
-            ? { backgroundImage: `url(${c.imageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-            : undefined
-        }
-      />
-      <div className="px-[26px] pt-4">
-        <div className="font-bold text-[22px]" style={{ color: "#B7D0DE" }}>
-          {c.title}
-        </div>
-        <div className="mt-2" style={{ color: "#899EAA", fontSize: 14 }}>
-          {c.tagsLabel}
-        </div>
+      <div className="font-bold text-[22px]" style={{ color: "#B7D0DE" }}>
+        {c.title}
+      </div>
+      <div className="mt-2" style={{ color: "rgba(183,208,222,.6)", fontSize: 14 }}>
+        {c.tagsLabel}
       </div>
     </div>
   );
@@ -559,9 +552,24 @@ function MobileCaseOverlay({
       className="fixed inset-0 z-[300] bg-[#101010]"
       style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 500ms cubic-bezier(.65,0,.35,1)" }}
     >
+      {c.bgImageMobileUrl && (
+        <img
+          src={c.bgImageMobileUrl}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ filter: "brightness(.8)" }}
+        />
+      )}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "linear-gradient(210deg, rgba(137,158,170,0.07) 0%, rgba(16,16,16,0) 55%)" }}
+        style={{
+          background:
+            "linear-gradient(210deg, rgba(137,158,170,0.07) 0%, rgba(16,16,16,0) 55%), rgba(16,16,16,.6)",
+        }}
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "rgba(0,0,0,.2)" }}
       />
       <div className="h-full overflow-y-auto box-border flex flex-col px-6 pt-6 pb-10 relative">
         <div className="flex justify-between items-center">
@@ -626,15 +634,17 @@ function MobileCaseOverlay({
             <audio ref={audio.audioRef} preload="metadata" className="hidden" />
           </div>
         )}
-        <a
-          href={c.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="self-start rounded-[9px] font-bold"
-          style={{ background: "none", border: "1px solid #5F7884", padding: "10px 22px", fontSize: 11, color: "#899EAA" }}
-        >
-          Visitar Sitio
-        </a>
+        {c.url && (
+          <a
+            href={c.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="self-start rounded-[9px] font-bold"
+            style={{ background: "none", border: "1px solid #5F7884", padding: "10px 22px", fontSize: 11, color: "#899EAA" }}
+          >
+            Visitar Sitio
+          </a>
+        )}
         <div className="flex justify-between mt-11">
           <button onClick={onPrev} className="bg-transparent border-none font-bold text-[13px] cursor-pointer p-0" style={{ color: "#899EAA" }}>
             ← Anterior
