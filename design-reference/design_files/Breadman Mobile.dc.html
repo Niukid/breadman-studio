@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:ital,wght@0,400;1,300;1,400&amp;family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,700;1,100;1,200;1,300;1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#101010;overscroll-behavior:none;height:100%;touch-action:pan-y}
+a{color:#899EAA;text-decoration:none}a:hover{color:#B7D0DE}
+@keyframes bmPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes bmSpin{to{transform:rotate(360deg)}}
+@keyframes bmBtnPulse{0%,100%{transform:scale(1)}50%{transform:scale(0.95)}}
+@keyframes bmHomeBg{0%{background-color:#732706}20%{background-color:#5F7884}40%{background-color:#6F4B52}60%{background-color:#283035}80%{background-color:#B65534}100%{background-color:#732706}}
+[data-sheet]{position:fixed;inset:0;transform:translateY(103%);transition:transform 500ms cubic-bezier(.65,0,.35,1);will-change:transform}
+[data-sheet][data-shown="true"]{transform:translateY(0)}
+[data-sheet] [data-reveal]{opacity:0;transform:translateY(18px);transition:opacity 500ms ease-in-out,transform 500ms ease-in-out}
+[data-sheet][data-active="true"] [data-reveal]{opacity:1;transform:none}
+[data-reveal="1"]{transition-delay:250ms}[data-reveal="2"]{transition-delay:500ms}[data-reveal="3"]{transition-delay:750ms}[data-reveal="4"]{transition-delay:1000ms}
+[data-stripe]{transition:height 500ms cubic-bezier(.65,0,.35,1);width:100%}
+[data-menu]{opacity:0;pointer-events:none;transition:opacity 500ms ease-in-out}
+[data-menu][data-open="true"]{opacity:1;pointer-events:auto}
+[data-menu] [data-mi]{opacity:0;transform:translateY(14px);transition:opacity 500ms ease-in-out,transform 500ms ease-in-out}
+[data-menu][data-open="true"] [data-mi]{opacity:1;transform:none}
+[data-mi="1"]{transition-delay:250ms}[data-mi="2"]{transition-delay:500ms}[data-mi="3"]{transition-delay:750ms}[data-mi="4"]{transition-delay:1000ms}
+[data-case]{transform:translateX(-100%);transition:transform 500ms cubic-bezier(.65,0,.35,1)}
+[data-case][data-open="true"]{transform:translateX(0)}
+input::placeholder,textarea::placeholder{color:#5F7884;font-family:'JetBrains Mono',monospace}
+[data-scroller]{scrollbar-width:none}[data-scroller]::-webkit-scrollbar{display:none}
+[data-chat]{opacity:0;transform:translateY(16px) scale(.98);pointer-events:none;transition:opacity 260ms ease,transform 260ms ease}
+[data-chat][data-open="true"]{opacity:1;transform:none;pointer-events:auto}
+[data-chat] [data-cscroll]{scrollbar-width:none}[data-chat] [data-cscroll]::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+
+<div style="position:fixed;inset:0;overflow:hidden;background:#101010;font-family:'JetBrains Mono',monospace">
+
+  <!-- 0 · INICIO -->
+  <div data-sheet="true" data-sheet-i="0" data-shown="{{ s0 }}" data-active="{{ a0 }}" style="background:#283035;animation:bmHomeBg 60s ease-in-out infinite;z-index:10">
+    <div data-scroller="true" style="height:100%;overflow-y:auto">
+      <div style="min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:64px 24px 40px;box-sizing:border-box">
+        <svg viewBox="0 0 156.16 50.74" fill="#899EAA" style="width:170px;margin-top:60px" aria-label="Breadman Studio"><g><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path><path d="M28.57,21.02v-3.42h-5.11v15.32h5.36v-7.22c0-.97,1.48-2.36,3.76-2.36.34,0,.76.04.97.13v-6.04h-.51c-2.36,0-4.01,2.41-4.47,3.59Z"></path><path d="M51.65,22.54c-1.06-3.29-3.88-5.66-7.77-5.66-5.32,0-8.82,3.92-8.48,9.03.34,4.52,3.84,7.72,9.28,7.72,2.95,0,5.28-1.18,7.05-2.83l-2.32-3.04c-1.14,1.06-2.62,1.77-4.47,1.77-1.44,0-2.62-.59-3.29-1.56l10.42-3.97-.42-1.48h0ZM40.89,24.86c.13-2.49,1.52-3.76,3.04-3.76,1.14,0,1.98.55,2.62,1.69,0,0-5.65,2.07-5.66,2.07Z"></path><path d="M61.78,17.18c-2.15,0-3.59.17-5.78.63l.93,4.09c1.56-.38,2.53-.46,3.33-.46,2.58,0,4.18.93,4.18,3.04v.25c-1.01-.76-2.53-1.27-4.52-1.27-3.97,0-6.33,2.19-6.33,5.06s2.4,5.02,6.2,5.02c2.45,0,4.09-.72,5.02-1.56v.93h4.98v-9.37c0-3.63-2.83-6.37-8.02-6.37h0ZM61.74,30.43c-1.65,0-2.62-.89-2.62-2.07s.97-2.07,2.62-2.07,2.74.84,2.74,2.07-1.14,2.07-2.74,2.07Z"></path><path d="M84.86,19.84c-1.22-1.69-3.17-2.74-5.49-2.74-4.05,0-7.22,3.59-7.22,8.23s3.17,8.1,7.22,8.1c2.57,0,4.6-1.1,5.82-2.95v2.45h4.98V0h-5.32v19.84ZM81.27,28.83c-2.03,0-3.59-1.6-3.59-3.55,0-2.07,1.56-3.59,3.59-3.59s3.63,1.52,3.63,3.59-1.65,3.55-3.63,3.55Z"></path><path d="M112.21,17.26c-2.74,0-4.22,1.77-4.81,2.91-.8-1.86-2.49-2.91-4.52-2.91-2.36,0-3.88,1.6-4.56,2.74v-2.41h-5.15v15.32h5.36v-8.61c0-1.39.72-2.32,2.07-2.32,1.22,0,1.98.72,1.98,2.57v8.36h5.36v-8.36c0-1.9.97-2.57,2.07-2.57,1.27,0,1.98.72,1.98,2.57v8.36h5.36v-10c0-3.5-2.11-5.66-5.15-5.66h0Z"></path><path d="M127.86,17.18c-2.15,0-3.59.17-5.78.63l.93,4.09c1.56-.38,2.53-.46,3.33-.46,2.58,0,4.18.93,4.18,3.04v.25c-1.01-.76-2.53-1.27-4.52-1.27-3.97,0-6.33,2.19-6.33,5.06s2.4,5.02,6.2,5.02c2.45,0,4.09-.72,5.02-1.56v.93h4.98v-9.37c0-3.63-2.83-6.37-8.02-6.37h0ZM127.82,30.43c-1.65,0-2.62-.89-2.62-2.07s.97-2.07,2.62-2.07,2.74.84,2.74,2.07-1.14,2.07-2.74,2.07Z"></path><path d="M148.92,17.26c-2.53,0-4.22,1.35-5.06,2.45v-2.11h-5.06v15.32h5.36v-8.61c0-1.39,1.23-2.32,2.49-2.32,1.39,0,2.36.76,2.36,2.57v8.36h5.36v-10c0-3.5-2.45-5.66-5.44-5.66h0Z"></path><path d="M6.38,41.17c-.53-.21-1.34-.36-1.99-.36-1.24,0-1.76.42-1.76,1.06,0,.6.59,1.1,1.95,2.04,1.64,1.14,2.64,2.12,2.64,3.48,0,1.85-1.62,3.17-4.07,3.17-.75,0-2.04-.18-2.58-.35l.03-1.97c.51.19,1.71.47,2.69.47,1.15,0,1.72-.58,1.72-1.23s-.6-1.14-1.97-2.07c-1.97-1.35-2.6-2.25-2.6-3.52,0-1.5,1.14-2.92,3.93-2.92.69,0,1.47.12,2.02.27l-.03,1.94h0Z"></path><path d="M31.05,41.13h-2.37v-1.95h6.92v1.95h-2.37v9.24h-2.17s0-9.24,0-9.24Z"></path><path d="M61.8,50.74c-2.82,0-4.36-1.85-4.36-4.98v-6.57h2.17v7.01c0,1.69,1.06,2.55,2.19,2.55s2.2-.85,2.2-2.55v-7.01h2.18v6.57c0,3.13-1.53,4.98-4.38,4.98Z"></path><path d="M88.62,39.19h3.15c3,0,5.81,1.81,5.81,5.58s-2.79,5.61-5.81,5.61h-3.15v-11.19ZM90.79,48.41h1.02c1.88,0,3.57-1.23,3.57-3.65s-1.69-3.62-3.57-3.62h-1.02v7.26Z"></path><path d="M119.7,39.19h2.18v11.19h-2.18v-11.19Z"></path><path d="M156.16,44.76c0,3.3-2.67,5.97-6.1,5.97s-6.12-2.67-6.12-5.97,2.65-5.94,6.12-5.94,6.1,2.65,6.1,5.94ZM146.13,44.76c0,2.19,1.7,3.97,3.93,3.97s3.91-1.78,3.91-3.97-1.7-3.94-3.91-3.94-3.93,1.78-3.93,3.94Z"></path></g></svg>
+        <button onClick="{{ enter }}" aria-label="Entrar" style="position:relative;width:180px;height:180px;background:none;border:none;padding:0;cursor:pointer;animation:bmPulse 1000ms ease-in-out infinite">
+          <span style="position:absolute;inset:0;border-radius:50%;border:2px dotted #899EAA;animation:bmSpin 16000ms linear infinite;display:block"></span>
+          <span style="position:absolute;inset:14px;border-radius:50%;background:#899EAA;display:block"></span>
+        </button>
+        <div style="color:#899EAA;font-size:13px;letter-spacing:.06em">Estudio de diseño</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1 · HOME -->
+  <div data-sheet="true" data-sheet-i="1" data-shown="{{ s1 }}" data-active="{{ a1 }}" style="background:#732706;animation:bmHomeBg 60s ease-in-out infinite;z-index:11">
+    <div data-scroller="true" style="height:100%;overflow-y:auto">
+      <div style="min-height:100%;display:flex;flex-direction:column;box-sizing:border-box;padding:24px 24px 48px">
+        <div style="display:flex;justify-content:flex-end;align-items:center">
+          <button onClick="{{ openMenu }}" aria-label="Menú" style="background:none;border:none;padding:8px 0;cursor:pointer;display:flex;flex-direction:column;gap:9px;width:44px"><span style="height:1.5px;background:#899EAA;display:block"></span><span style="height:1.5px;background:#899EAA;display:block"></span><span style="height:1.5px;background:#899EAA;display:block"></span></button>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:28px">
+          <svg data-reveal="0" viewBox="0 0 156.16 50.74" fill="#899EAA" style="width:160px" aria-label="Breadman Studio"><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path><path d="M28.57,21.02v-3.42h-5.11v15.32h5.36v-7.22c0-.97,1.48-2.36,3.76-2.36.34,0,.76.04.97.13v-6.04h-.51c-2.36,0-4.01,2.41-4.47,3.59Z"></path><path d="M51.65,22.54c-1.06-3.29-3.88-5.66-7.77-5.66-5.32,0-8.82,3.92-8.48,9.03.34,4.52,3.84,7.72,9.28,7.72,2.95,0,5.28-1.18,7.05-2.83l-2.32-3.04c-1.14,1.06-2.62,1.77-4.47,1.77-1.44,0-2.62-.59-3.29-1.56l10.42-3.97-.42-1.48h0ZM40.89,24.86c.13-2.49,1.52-3.76,3.04-3.76,1.14,0,1.98.55,2.62,1.69,0,0-5.65,2.07-5.66,2.07Z"></path><path d="M61.78,17.18c-2.15,0-3.59.17-5.78.63l.93,4.09c1.56-.38,2.53-.46,3.33-.46,2.58,0,4.18.93,4.18,3.04v.25c-1.01-.76-2.53-1.27-4.52-1.27-3.97,0-6.33,2.19-6.33,5.06s2.4,5.02,6.2,5.02c2.45,0,4.09-.72,5.02-1.56v.93h4.98v-9.37c0-3.63-2.83-6.37-8.02-6.37h0ZM61.74,30.43c-1.65,0-2.62-.89-2.62-2.07s.97-2.07,2.62-2.07,2.74.84,2.74,2.07-1.14,2.07-2.74,2.07Z"></path><path d="M84.86,19.84c-1.22-1.69-3.17-2.74-5.49-2.74-4.05,0-7.22,3.59-7.22,8.23s3.17,8.1,7.22,8.1c2.57,0,4.6-1.1,5.82-2.95v2.45h4.98V0h-5.32v19.84ZM81.27,28.83c-2.03,0-3.59-1.6-3.59-3.55,0-2.07,1.56-3.59,3.59-3.59s3.63,1.52,3.63,3.59-1.65,3.55-3.63,3.55Z"></path><path d="M112.21,17.26c-2.74,0-4.22,1.77-4.81,2.91-.8-1.86-2.49-2.91-4.52-2.91-2.36,0-3.88,1.6-4.56,2.74v-2.41h-5.15v15.32h5.36v-8.61c0-1.39.72-2.32,2.07-2.32,1.22,0,1.98.72,1.98,2.57v8.36h5.36v-8.36c0-1.9.97-2.57,2.07-2.57,1.27,0,1.98.72,1.98,2.57v8.36h5.36v-10c0-3.5-2.11-5.66-5.15-5.66h0Z"></path><path d="M127.86,17.18c-2.15,0-3.59.17-5.78.63l.93,4.09c1.56-.38,2.53-.46,3.33-.46,2.58,0,4.18.93,4.18,3.04v.25c-1.01-.76-2.53-1.27-4.52-1.27-3.97,0-6.33,2.19-6.33,5.06s2.4,5.02,6.2,5.02c2.45,0,4.09-.72,5.02-1.56v.93h4.98v-9.37c0-3.63-2.83-6.37-8.02-6.37h0ZM127.82,30.43c-1.65,0-2.62-.89-2.62-2.07s.97-2.07,2.62-2.07,2.74.84,2.74,2.07-1.14,2.07-2.74,2.07Z"></path><path d="M148.92,17.26c-2.53,0-4.22,1.35-5.06,2.45v-2.11h-5.06v15.32h5.36v-8.61c0-1.39,1.23-2.32,2.49-2.32,1.39,0,2.36.76,2.36,2.57v8.36h5.36v-10c0-3.5-2.45-5.66-5.44-5.66h0Z"></path><path d="M6.38,41.17c-.53-.21-1.34-.36-1.99-.36-1.24,0-1.76.42-1.76,1.06,0,.6.59,1.1,1.95,2.04,1.64,1.14,2.64,2.12,2.64,3.48,0,1.85-1.62,3.17-4.07,3.17-.75,0-2.04-.18-2.58-.35l.03-1.97c.51.19,1.71.47,2.69.47,1.15,0,1.72-.58,1.72-1.23s-.6-1.14-1.97-2.07c-1.97-1.35-2.6-2.25-2.6-3.52,0-1.5,1.14-2.92,3.93-2.92.69,0,1.47.12,2.02.27l-.03,1.94h0Z"></path><path d="M31.05,41.13h-2.37v-1.95h6.92v1.95h-2.37v9.24h-2.17s0-9.24,0-9.24Z"></path><path d="M61.8,50.74c-2.82,0-4.36-1.85-4.36-4.98v-6.57h2.17v7.01c0,1.69,1.06,2.55,2.19,2.55s2.2-.85,2.2-2.55v-7.01h2.18v6.57c0,3.13-1.53,4.98-4.38,4.98Z"></path><path d="M88.62,39.19h3.15c3,0,5.81,1.81,5.81,5.58s-2.79,5.61-5.81,5.61h-3.15v-11.19ZM90.79,48.41h1.02c1.88,0,3.57-1.23,3.57-3.65s-1.69-3.62-3.57-3.62h-1.02v7.26Z"></path><path d="M119.7,39.19h2.18v11.19h-2.18v-11.19Z"></path><path d="M156.16,44.76c0,3.3-2.67,5.97-6.1,5.97s-6.12-2.67-6.12-5.97,2.65-5.94,6.12-5.94,6.1,2.65,6.1,5.94ZM146.13,44.76c0,2.19,1.7,3.97,3.93,3.97s3.91-1.78,3.91-3.97-1.7-3.94-3.91-3.94-3.93,1.78-3.93,3.94Z"></path></svg>
+          <div data-reveal="1" style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#899EAA;font-size:28px;line-height:1.15;letter-spacing:.02em">DISEÑO-MOTION<br>WEB-SONIDO</div>
+          <div data-reveal="2" style="color:#899EAA;font-size:12px;line-height:1.6;max-width:280px">Marcas que funcionan en imagen, movimiento y sonido.</div>
+          <button data-reveal="3" onClick="{{ goTrabajos }}" style="font-family:'JetBrains Mono',monospace;color:#899EAA;background:none;border:1px solid #899EAA;border-radius:10px;padding:12px 36px;font-size:14px;cursor:pointer;transition:background 250ms ease,color 250ms ease" style-hover="background:#899EAA;color:#283035" style-active="background:#899EAA;color:#283035">Ver Trabajos</button>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+          <button onClick="{{ goTrabajos }}" aria-label="Siguiente sección" style="background:none;border:none;cursor:pointer;padding:8px"><svg viewBox="0 0 24 24" style="width:26px" fill="none" stroke="#899EAA" stroke-width="2"><path d="M12 20V6M5 12l7-7 7 7"></path></svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2 · TRABAJOS -->
+  <div data-sheet="true" data-sheet-i="2" data-shown="{{ s2 }}" data-active="{{ a2 }}" style="background:#5F7884;z-index:12">
+    <div data-scroller="true" style="height:100%;overflow-y:auto">
+      <div style="box-sizing:border-box;padding:24px 24px 80px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:36px">
+          <button onClick="{{ goHome }}" aria-label="Home" style="background:none;border:none;padding:0;cursor:pointer"><svg viewBox="0 0 21 33.5" fill="#B7D0DE" style="width:19px"><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path></svg></button>
+          <button onClick="{{ openMenu }}" aria-label="Menú" style="background:none;border:none;padding:8px 0;cursor:pointer;display:flex;flex-direction:column;gap:9px;width:44px"><span style="height:1.5px;background:#B7D0DE;display:block"></span><span style="height:1.5px;background:#B7D0DE;display:block"></span><span style="height:1.5px;background:#B7D0DE;display:block"></span></button>
+        </div>
+        <h1 data-reveal="0" style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#B7D0DE;font-size:42px;margin:0 0 10px;letter-spacing:.02em">TRABAJOS</h1>
+        <p data-reveal="1" style="color:#B7D0DE;font-size:14px;line-height:1.55;margin:0 0 22px">Casos de diseño, branding, web y motion. Sectores: arquitectura, salud, finanzas, música y cultura.</p>
+        <div data-reveal="2" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:44px">
+          <span style="border:1px solid #B7D0DE;color:#B7D0DE;border-radius:999px;padding:7px 18px;font-size:13px">Todo</span>
+          <span style="border:1px solid #B7D0DE;color:#B7D0DE;border-radius:999px;padding:7px 18px;font-size:13px">Branding</span>
+          <span style="border:1px solid #B7D0DE;color:#B7D0DE;border-radius:999px;padding:7px 18px;font-size:13px">Web</span>
+          <span style="border:1px solid #B7D0DE;color:#B7D0DE;border-radius:999px;padding:7px 18px;font-size:13px">Audio</span>
+        </div>
+        <div data-reveal="3" style="display:flex;flex-direction:column;gap:28px">
+          <div onClick="{{ openAustral }}" style="background:rgba(16,16,16,0.16);border-radius:14px;padding:0 0 26px;cursor:pointer;transition:transform 250ms ease" style-active="transform:scale(0.98)">
+            <div style="height:250px"></div>
+            <div style="padding:0 26px">
+              <div style="color:#B7D0DE;font-size:22px;font-weight:700">Austral Arquitectura</div>
+              <div style="color:#899EAA;font-size:14px;margin-top:8px">branding · web</div>
+            </div>
+          </div>
+          <div onClick="{{ openNiukid }}" style="background:rgba(16,16,16,0.16);border-radius:14px;padding:0 0 26px;cursor:pointer;transition:transform 250ms ease" style-active="transform:scale(0.98)">
+            <div style="height:250px"></div>
+            <div style="padding:0 26px">
+              <div style="color:#B7D0DE;font-size:22px;font-weight:700">Niukid</div>
+              <div style="color:#899EAA;font-size:14px;margin-top:8px">Identidad · motion · sonido</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 · QUÉ HACEMOS -->
+  <div data-sheet="true" data-sheet-i="3" data-shown="{{ s3 }}" data-active="{{ a3 }}" style="background:#B65534;z-index:13">
+    <div data-scroller="true" style="height:100%;overflow-y:auto">
+      <div style="box-sizing:border-box;padding:24px 24px 80px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px">
+          <button onClick="{{ goHome }}" aria-label="Home" style="background:none;border:none;padding:0;cursor:pointer"><svg viewBox="0 0 21 33.5" fill="#D9B395" style="width:19px"><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path></svg></button>
+          <button onClick="{{ openMenu }}" aria-label="Menú" style="background:none;border:none;padding:8px 0;cursor:pointer;display:flex;flex-direction:column;gap:9px;width:44px"><span style="height:1.5px;background:#D9B395;display:block"></span><span style="height:1.5px;background:#D9B395;display:block"></span><span style="height:1.5px;background:#D9B395;display:block"></span></button>
+        </div>
+        <h1 data-reveal="0" style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#D9B395;font-size:40px;margin:0 0 10px;letter-spacing:.02em">QUÉ HACEMOS</h1>
+        <p data-reveal="1" style="color:#D9B395;font-size:14px;line-height:1.55;margin:0 0 40px">Servicios integrados según<br>lo que necesite la marca.</p>
+        <div data-reveal="2" style="display:flex;flex-direction:column;gap:34px;color:#D9B395">
+          <div style="display:grid;grid-template-columns:52px 1fr;column-gap:10px">
+            <div style="font-size:26px">01</div>
+            <div><div style="font-size:26px;line-height:1.25">Identidad visual y branding</div><div style="font-size:13px;line-height:1.6;margin-top:10px">Marcas desde cero o rediseños: logo, sistema, aplicaciones.</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:52px 1fr;column-gap:10px">
+            <div style="font-size:26px">02</div>
+            <div><div style="font-size:26px;line-height:1.25">Diseño web</div><div style="font-size:13px;line-height:1.6;margin-top:10px">Sitios que se ven bien y funcionan: portafolios, marcas, e-commerce.</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:52px 1fr;column-gap:10px">
+            <div style="font-size:26px">03</div>
+            <div><div style="font-size:26px;line-height:1.25">Motion graphics</div><div style="font-size:13px;line-height:1.6;margin-top:10px">Piezas en movimiento para redes, web y presentaciones.</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:52px 1fr;column-gap:10px">
+            <div style="font-size:26px">04</div>
+            <div><div style="font-size:26px;line-height:1.25">Dirección creativa</div><div style="font-size:13px;line-height:1.6;margin-top:10px">La mirada completa: concepto, estética y coherencia de principio a fin.</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:52px 1fr;column-gap:10px">
+            <div style="font-size:26px">05</div>
+            <div><div style="font-size:26px;line-height:1.25">Diseño sonoro</div><div style="font-size:13px;line-height:1.6;margin-top:10px">Identidad de audio, música para piezas audiovisuales, logo sonoro.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4 · SOBRE BREADMAN -->
+  <div data-sheet="true" data-sheet-i="4" data-shown="{{ s4 }}" data-active="{{ a4 }}" style="background:#6F4B52;z-index:14">
+    <img src="assets/sobre-silueta.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;pointer-events:none">
+    <div data-scroller="true" style="position:relative;height:100%;overflow-y:auto">
+      <div style="box-sizing:border-box;padding:24px 24px 80px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:34px">
+          <button onClick="{{ goHome }}" aria-label="Home" style="background:none;border:none;padding:0;cursor:pointer"><svg viewBox="0 0 21 33.5" fill="#899EAA" style="width:19px"><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path></svg></button>
+          <button onClick="{{ openMenu }}" aria-label="Menú" style="background:none;border:none;padding:8px 0;cursor:pointer;display:flex;flex-direction:column;gap:9px;width:44px"><span style="height:1.5px;background:#899EAA;display:block"></span><span style="height:1.5px;background:#899EAA;display:block"></span><span style="height:1.5px;background:#899EAA;display:block"></span></button>
+        </div>
+        <h1 data-reveal="0" style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#899EAA;font-size:38px;margin:0 0 26px;letter-spacing:.02em">SOBRE BREADMAN</h1>
+        <p data-reveal="1" style="color:#899EAA;font-size:15px;line-height:1.6;margin:0 0 34px">Breadman es un estudio de diseño y dirección creativa fundado por Fernando, con base en el Valle del Aconcagua.<br>Trabajamos en identidad visual, branding, web design, motion graphics y sonido — todo integrado como una sola disciplina.</p>
+        <p data-reveal="2" style="color:#899EAA;font-size:15px;line-height:1.6;margin:0">Venimos de años de trabajo en sectores distintos: arquitectura, salud, finanzas y cultura. Creemos que las marcas fuertes se construyen con método, criterio y las manos en el masa. Sin sobreproducciones, sin jerga. Bien hechas y a tiempo.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5 · CONTACTO -->
+  <div data-sheet="true" data-sheet-i="5" data-shown="{{ s5 }}" data-active="{{ a5 }}" style="background:#283035;z-index:15">
+    <div data-scroller="true" style="height:100%;overflow-y:auto">
+      <div style="box-sizing:border-box;padding:24px 24px 48px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px">
+          <button onClick="{{ goHome }}" aria-label="Home" style="background:none;border:none;padding:0;cursor:pointer"><svg viewBox="0 0 21 33.5" fill="#899EAA" style="width:19px"><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path></svg></button>
+          <button onClick="{{ openMenu }}" aria-label="Menú" style="background:none;border:none;padding:8px 0;cursor:pointer;display:flex;flex-direction:column;gap:9px;width:44px"><span style="height:1.5px;background:#899EAA;display:block"></span><span style="height:1.5px;background:#899EAA;display:block"></span><span style="height:1.5px;background:#899EAA;display:block"></span></button>
+        </div>
+        <h1 data-reveal="0" style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#899EAA;font-size:40px;margin:0 0 10px;letter-spacing:.02em">CONTACTO</h1>
+        <p data-reveal="1" style="color:#899EAA;font-size:12px;line-height:1.55;margin:0 0 26px">¿Proyecto nuevo? Cuéntanos.<br>Respondemos rápido.</p>
+        <div data-reveal="2" style="display:flex;flex-direction:column;gap:10px">
+          <input placeholder="Nombre" style="background:none;border:1px solid #5F7884;border-radius:10px;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:14px;color:#B7D0DE;outline:none">
+          <input placeholder="Email" style="background:none;border:1px solid #5F7884;border-radius:10px;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:14px;color:#B7D0DE;outline:none">
+          <input placeholder="Tipo de proyecto" style="background:none;border:1px solid #5F7884;border-radius:10px;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:14px;color:#B7D0DE;outline:none">
+          <textarea placeholder="Mensaje" rows="3" style="background:none;border:1px solid #5F7884;border-radius:10px;padding:13px 16px;font-family:'JetBrains Mono',monospace;font-size:14px;color:#B7D0DE;outline:none;resize:none"></textarea>
+          <div style="display:flex;align-items:center;gap:16px">
+            <button onClick="{{ send }}" data-sending="{{ sending }}" style="align-self:flex-start;background:none;border:1px solid #5F7884;border-radius:10px;padding:12px 26px;font-family:'JetBrains Mono',monospace;font-size:14px;color:#899EAA;cursor:pointer;transition:background 250ms ease,color 250ms ease" style-hover="background:#5F7884;color:#B7D0DE">{{ sendLabel }}</button>
+            <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}"><span style="color:#B7D0DE;font-size:12px">Recibido. Te respondemos pronto.</span></sc-if>
+          </div>
+        </div>
+        <p data-reveal="3" style="color:#899EAA;font-size:13px;margin:22px 0 28px">Email directo · Instagram · Facebook</p>
+        <div data-reveal="4" style="display:flex;flex-direction:column;align-items:center;gap:10px">
+          <svg viewBox="0 0 156.16 50.74" fill="#899EAA" style="width:105px" aria-label="Breadman Studio"><g><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path><path d="M28.57,21.02v-3.42h-5.11v15.32h5.36v-7.22c0-.97,1.48-2.36,3.76-2.36.34,0,.76.04.97.13v-6.04h-.51c-2.36,0-4.01,2.41-4.47,3.59Z"></path><path d="M51.65,22.54c-1.06-3.29-3.88-5.66-7.77-5.66-5.32,0-8.82,3.92-8.48,9.03.34,4.52,3.84,7.72,9.28,7.72,2.95,0,5.28-1.18,7.05-2.83l-2.32-3.04c-1.14,1.06-2.62,1.77-4.47,1.77-1.44,0-2.62-.59-3.29-1.56l10.42-3.97-.42-1.48h0ZM40.89,24.86c.13-2.49,1.52-3.76,3.04-3.76,1.14,0,1.98.55,2.62,1.69,0,0-5.65,2.07-5.66,2.07Z"></path><path d="M61.78,17.18c-2.15,0-3.59.17-5.78.63l.93,4.09c1.56-.38,2.53-.46,3.33-.46,2.58,0,4.18.93,4.18,3.04v.25c-1.01-.76-2.53-1.27-4.52-1.27-3.97,0-6.33,2.19-6.33,5.06s2.4,5.02,6.2,5.02c2.45,0,4.09-.72,5.02-1.56v.93h4.98v-9.37c0-3.63-2.83-6.37-8.02-6.37h0ZM61.74,30.43c-1.65,0-2.62-.89-2.62-2.07s.97-2.07,2.62-2.07,2.74.84,2.74,2.07-1.14,2.07-2.74,2.07Z"></path><path d="M84.86,19.84c-1.22-1.69-3.17-2.74-5.49-2.74-4.05,0-7.22,3.59-7.22,8.23s3.17,8.1,7.22,8.1c2.57,0,4.6-1.1,5.82-2.95v2.45h4.98V0h-5.32v19.84ZM81.27,28.83c-2.03,0-3.59-1.6-3.59-3.55,0-2.07,1.56-3.59,3.59-3.59s3.63,1.52,3.63,3.59-1.65,3.55-3.63,3.55Z"></path><path d="M112.21,17.26c-2.74,0-4.22,1.77-4.81,2.91-.8-1.86-2.49-2.91-4.52-2.91-2.36,0-3.88,1.6-4.56,2.74v-2.41h-5.15v15.32h5.36v-8.61c0-1.39.72-2.32,2.07-2.32,1.22,0,1.98.72,1.98,2.57v8.36h5.36v-8.36c0-1.9.97-2.57,2.07-2.57,1.27,0,1.98.72,1.98,2.57v8.36h5.36v-10c0-3.5-2.11-5.66-5.15-5.66h0Z"></path><path d="M127.86,17.18c-2.15,0-3.59.17-5.78.63l.93,4.09c1.56-.38,2.53-.46,3.33-.46,2.58,0,4.18.93,4.18,3.04v.25c-1.01-.76-2.53-1.27-4.52-1.27-3.97,0-6.33,2.19-6.33,5.06s2.4,5.02,6.2,5.02c2.45,0,4.09-.72,5.02-1.56v.93h4.98v-9.37c0-3.63-2.83-6.37-8.02-6.37h0ZM127.82,30.43c-1.65,0-2.62-.89-2.62-2.07s.97-2.07,2.62-2.07,2.74.84,2.74,2.07-1.14,2.07-2.74,2.07Z"></path><path d="M148.92,17.26c-2.53,0-4.22,1.35-5.06,2.45v-2.11h-5.06v15.32h5.36v-8.61c0-1.39,1.23-2.32,2.49-2.32,1.39,0,2.36.76,2.36,2.57v8.36h5.36v-10c0-3.5-2.45-5.66-5.44-5.66h0Z"></path><path d="M6.38,41.17c-.53-.21-1.34-.36-1.99-.36-1.24,0-1.76.42-1.76,1.06,0,.6.59,1.1,1.95,2.04,1.64,1.14,2.64,2.12,2.64,3.48,0,1.85-1.62,3.17-4.07,3.17-.75,0-2.04-.18-2.58-.35l.03-1.97c.51.19,1.71.47,2.69.47,1.15,0,1.72-.58,1.72-1.23s-.6-1.14-1.97-2.07c-1.97-1.35-2.6-2.25-2.6-3.52,0-1.5,1.14-2.92,3.93-2.92.69,0,1.47.12,2.02.27l-.03,1.94h0Z"></path><path d="M31.05,41.13h-2.37v-1.95h6.92v1.95h-2.37v9.24h-2.17s0-9.24,0-9.24Z"></path><path d="M61.8,50.74c-2.82,0-4.36-1.85-4.36-4.98v-6.57h2.17v7.01c0,1.69,1.06,2.55,2.19,2.55s2.2-.85,2.2-2.55v-7.01h2.18v6.57c0,3.13-1.53,4.98-4.38,4.98Z"></path><path d="M88.62,39.19h3.15c3,0,5.81,1.81,5.81,5.58s-2.79,5.61-5.81,5.61h-3.15v-11.19ZM90.79,48.41h1.02c1.88,0,3.57-1.23,3.57-3.65s-1.69-3.62-3.57-3.62h-1.02v7.26Z"></path><path d="M119.7,39.19h2.18v11.19h-2.18v-11.19Z"></path><path d="M156.16,44.76c0,3.3-2.67,5.97-6.1,5.97s-6.12-2.67-6.12-5.97,2.65-5.94,6.12-5.94,6.1,2.65,6.1,5.94ZM146.13,44.76c0,2.19,1.7,3.97,3.93,3.97s3.91-1.78,3.91-3.97-1.7-3.94-3.91-3.94-3.93,1.78-3.93,3.94Z"></path></g></svg>
+          <div style="color:#899EAA;font-size:11px;text-align:center;line-height:1.7">Hecho con método y tiempo<br>© 2026 Breadman.Studio</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRANJAS -->
+  <div onClick="{{ goNext }}" data-stripes="true" style="position:fixed;left:0;right:0;bottom:0;z-index:100;display:flex;flex-direction:column;cursor:pointer;opacity:{{ stripesOpacity }};transition:opacity 500ms ease-in-out">
+    <div data-stripe="true" style="background:#5F7884;height:{{ h2 }}"></div>
+    <div data-stripe="true" style="background:#B65534;height:{{ h3 }}"></div>
+    <div data-stripe="true" style="background:#6F4B52;height:{{ h4 }}"></div>
+    <div data-stripe="true" style="background:#283035;height:{{ h5 }}"></div>
+  </div>
+
+  <!-- VER TRABAJO -->
+  <div data-case="true" data-open="{{ caseOpen }}" style="position:fixed;inset:0;z-index:300;background:#101010">
+    <div style="position:absolute;inset:0;background:linear-gradient(210deg, rgba(137,158,170,0.07) 0%, rgba(16,16,16,0) 55%);pointer-events:none"></div>
+    <div style="height:100%;overflow-y:auto;box-sizing:border-box;display:flex;flex-direction:column;padding:24px 24px 40px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button onClick="{{ goHome }}" aria-label="Home" style="background:none;border:none;padding:0;cursor:pointer"><svg viewBox="0 0 21 33.5" fill="#899EAA" style="width:19px"><path d="M15.74,16.29c2.45-1.6,3.84-4.14,3.84-6.75,0-4.52-2.45-8.1-9.66-8.1H0v31.48h10.81c6.96,0,10-4.22,10-8.57,0-3.46-1.86-6.46-5.07-8.06h0ZM6.03,6.33h2.62c4.18,0,5.44,1.65,5.44,3.97,0,2.57-2.07,4.31-5.61,4.31h-2.45s0-8.27,0-8.27ZM9.16,28.02h-3.12v-9.07h3c3.63,0,5.7,1.77,5.7,4.68,0,2.36-1.27,4.39-5.57,4.39Z"></path></svg></button>
+        <button onClick="{{ closeCase }}" aria-label="Cerrar" style="background:none;border:none;padding:6px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:34px" stroke="#899EAA" stroke-width="1" fill="none"><path d="M4 4l16 16M20 4L4 20"></path></svg></button>
+      </div>
+      <div style="flex:1;min-height:24px"></div>
+      <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#899EAA;font-size:40px;line-height:1.1;margin:0 0 26px;text-align:left">{{ caseTitle }}</h1>
+      <div style="color:#899EAA;font-size:13px;margin-bottom:22px">{{ caseTags }}</div>
+      <div style="color:#899EAA;font-size:13px;line-height:1.55;margin-bottom:24px">{{ caseDesc }}</div>
+      <div style="color:#B7D0DE;font-size:18px;font-weight:700;margin-bottom:12px">Qué se hizo</div>
+      <div style="color:#899EAA;font-size:13px;margin-bottom:30px">{{ caseMade }}</div>
+      <sc-if value="{{ hasAudio }}" hint-placeholder-val="{{ false }}">
+      <div style="border:1px solid #5F7884;border-radius:12px;padding:12px 14px;margin-bottom:30px">
+        <div style="color:#5F7884;font-size:10px;letter-spacing:.14em;margin-bottom:11px">DISEÑO SONORO</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <button onClick="{{ togglePlay }}" aria-label="Reproducir" style="flex:none;width:40px;height:40px;border-radius:50%;border:1px solid #899EAA;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 250ms ease" style-hover="background:rgba(137,158,170,0.12)">
+            <sc-if value="{{ playing }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:15px" fill="#899EAA"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg></sc-if>
+            <sc-if value="{{ notPlaying }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" style="width:15px;margin-left:2px" fill="#899EAA"><path d="M7 4v16l13-8z"></path></svg></sc-if>
+          </button>
+          <div style="flex:1;min-width:0">
+            <div onClick="{{ seek }}" style="height:6px;border-radius:3px;background:rgba(137,158,170,0.22);cursor:pointer;overflow:hidden"><div style="height:100%;width:{{ audioPct }};background:#899EAA"></div></div>
+            <div style="display:flex;justify-content:space-between;color:#5F7884;font-size:11px;margin-top:7px"><span>{{ audioCurLabel }}</span><span>{{ audioDurLabel }}</span></div>
+          </div>
+        </div>
+      </div>
+      <audio ref="{{ setAudioRef }}" preload="metadata" style="display:none"></audio>
+      </sc-if>
+      <button style="align-self:flex-start;background:none;border:1px solid #5F7884;border-radius:9px;padding:10px 22px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#899EAA;cursor:pointer;transition:background 250ms ease" style-hover="background:#283035">Visitar Sitio</button>
+      <div style="display:flex;justify-content:space-between;margin-top:44px">
+        <button onClick="{{ prevCase }}" style="background:none;border:none;color:#899EAA;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;padding:0;transition:color 250ms ease" style-hover="color:#B7D0DE">← Anterior</button>
+        <button onClick="{{ nextCase }}" style="background:none;border:none;color:#899EAA;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;padding:0;transition:color 250ms ease" style-hover="color:#B7D0DE">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENÚ -->
+  <div data-menu="true" data-open="{{ menuOpen }}" style="position:fixed;inset:0;z-index:400;background:#283035">
+    <div style="height:100%;box-sizing:border-box;display:flex;flex-direction:column;padding:24px">
+      <div style="display:flex;justify-content:flex-end">
+        <button onClick="{{ closeMenu }}" aria-label="Cerrar menú" style="background:none;border:none;padding:6px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:34px" stroke="#899EAA" stroke-width="1" fill="none"><path d="M4 4l16 16M20 4L4 20"></path></svg></button>
+      </div>
+      <nav style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:30px">
+        <button data-mi="0" onClick="{{ menuHome }}" style="background:none;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:28px;cursor:pointer;padding:0;color:{{ cHome }};transition:color 250ms ease">Home</button>
+        <button data-mi="1" onClick="{{ menuTrabajos }}" style="background:none;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:28px;cursor:pointer;padding:0;color:{{ cTrabajos }};transition:color 250ms ease">Trabajos</button>
+        <button data-mi="2" onClick="{{ menuQue }}" style="background:none;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:28px;cursor:pointer;padding:0;color:{{ cQue }};transition:color 250ms ease">Qué hacemos</button>
+        <button data-mi="3" onClick="{{ menuSobre }}" style="background:none;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:28px;cursor:pointer;padding:0;color:{{ cSobre }};transition:color 250ms ease">Sobre Breadman</button>
+        <button data-mi="4" onClick="{{ menuContacto }}" style="background:none;border:none;text-align:center;font-family:'JetBrains Mono',monospace;font-size:28px;cursor:pointer;padding:0;color:{{ cContacto }};transition:color 250ms ease">Contacto</button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ASISTENTE / CHAT -->
+  <sc-if value="{{ chatFabShow }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ toggleChat }}" aria-label="Abrir chat asistente" style="position:fixed;right:20px;bottom:24px;z-index:350;width:58px;height:58px;border-radius:50%;background:{{ botColor }};display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(0,0,0,.45);cursor:pointer;border:none;transition:background 500ms ease"><svg viewBox="0 0 24 24" style="width:27px" fill="none" stroke="#16191c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.1A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"></path><path d="M8.4 12h.01M12 12h.01M15.6 12h.01"></path></svg></button>
+  </sc-if>
+
+  <div data-chat data-open="{{ chatOpen }}" style="position:fixed;left:12px;right:12px;bottom:12px;top:70px;z-index:360;display:flex;flex-direction:column;background:#1b1f23;border:1px solid {{ botColor }};border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.6)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:{{ botColor }};transition:background 500ms ease">
+      <div style="display:flex;flex-direction:column;line-height:1.2">
+        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:#16191c">Asistente Breadman</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(22,25,28,.68)">Ventas · consultas · agenda</span>
+      </div>
+      <button onClick="{{ closeChat }}" aria-label="Cerrar chat" style="background:none;border:none;cursor:pointer;padding:4px;display:flex"><svg viewBox="0 0 24 24" style="width:22px" stroke="#16191c" stroke-width="2" fill="none"><path d="M5 5l14 14M19 5L5 19"></path></svg></button>
+    </div>
+    <div ref="{{ setChatScroll }}" data-cscroll style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="1">
+        <div style="align-self:{{ m.align }};max-width:82%;background:{{ m.bg }};color:{{ m.color }};padding:9px 13px;border-radius:13px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5;white-space:pre-wrap">{{ m.text }}</div>
+      </sc-for>
+      <sc-if value="{{ chatLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="align-self:flex-start;background:rgba(255,255,255,.07);color:#9fb0b8;padding:9px 13px;border-radius:13px;font-family:'JetBrains Mono',monospace;font-size:13px">escribiendo…</div>
+      </sc-if>
+    </div>
+    <div style="display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+      <input ref="{{ setChatInput }}" onKeyDown="{{ chatKey }}" placeholder="Escribe tu consulta…" style="flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:16px;color:#DDE6EA;outline:none">
+      <button onClick="{{ sendChat }}" aria-label="Enviar" style="flex:none;width:46px;border-radius:10px;background:{{ botColor }};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 500ms ease"><svg viewBox="0 0 24 24" style="width:18px" fill="#16191c"><path d="M3 20l18-8L3 4v6l12 2-12 2z"></path></svg></button>
+    </div>
+  </div>
+
+</div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#6F4B52"></rect><circle cx="50" cy="50" r="20" fill="#899EAA"></circle></svg></template></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;alwaysShowIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Navegación&quot;},&quot;stripeHeight&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:9,&quot;min&quot;:5,&quot;max&quot;:16,&quot;step&quot;:1,&quot;unit&quot;:&quot;px&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Franjas&quot;},&quot;whatsapp&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;56920191624&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contacto&quot;}}">
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    let visited = false;
+    try { visited = !!sessionStorage.getItem('bm-visited'); } catch (e) {}
+    if (this.props.alwaysShowIntro) visited = false;
+    this.state = { cur: visited ? 1 : 0, visited: visited, menu: false, caseOpen: false, caseIdx: 0, sent: false, sending: false, playing: false, audioCur: 0, audioDur: 0,
+      chatOpen: false, chatLoading: false,
+      messages: [{ role: 'assistant', content: 'Hola, soy el asistente de Breadman Studio. Te ayudo con servicios, presupuestos o a coordinar una reunión. ¿Qué tienes en mente?' }] };
+    this.lockUntil = 0;
+    this.cases = [
+      { title: 'Austral Arquitectura', tags: 'Branding · Diseño · web · 2026', desc: 'Descripción corta: el brief, el problema (2-4 líneas).', made: '— disciplina · disciplina · disciplina', audio: '' },
+      { title: 'Niukid', tags: 'Identidad · motion · sonido · 2026', desc: 'Descripción corta: el brief, el problema (2-4 líneas).', made: '— disciplina · disciplina · disciplina', audio: '' }
+    ];
+  }
+  componentDidMount() {
+    this.onWheel = (e) => { this.gesture(e.deltaY > 0 ? 1 : -1, Math.abs(e.deltaY)); };
+    this.onTS = (e) => {
+      this.tY = e.touches[0].clientY;
+      this.tT = Date.now();
+      this.drag = null;
+      this.fromStripes = !!e.target.closest('[data-stripes]');
+    };
+    this.onTM = (e) => {
+      if (this.tY == null) return;
+      const s = this.state;
+      if (s.menu || s.caseOpen || s.chatOpen || Date.now() < this.lockUntil) return;
+      const y = e.touches[0].clientY;
+      const dy = this.tY - y; // >0 = dedo hacia arriba
+      if (!this.drag) {
+        const sc = this.scroller();
+        const min = s.visited ? 1 : 0;
+        if ((this.fromStripes || dy > 10) && s.cur < 5 && (this.fromStripes || !sc || sc.scrollHeight - sc.scrollTop - sc.clientHeight <= 4)) {
+          if (dy > 10 || this.fromStripes) this.drag = { dir: 1, el: document.querySelector('[data-sheet-i="' + (s.cur + 1) + '"]') };
+        } else if (dy < -10 && s.cur > min && (!sc || sc.scrollTop <= 4)) {
+          this.drag = { dir: -1, el: document.querySelector('[data-sheet-i="' + s.cur + '"]') };
+        }
+        if (this.drag) { this.drag.el.style.transition = 'none'; }
+      }
+      if (this.drag) {
+        e.preventDefault();
+        const H = window.innerHeight;
+        this.vel = (dy - (this.lastDy || 0)) / Math.max(1, Date.now() - (this.lastT || this.tT));
+        this.lastDy = dy; this.lastT = Date.now();
+        this.dragDy = dy;
+        if (this.drag.dir === 1) {
+          const off = Math.max(0, H * 1.03 - Math.max(0, dy));
+          this.drag.el.style.transform = 'translateY(' + off + 'px)';
+        } else {
+          const off = Math.min(H * 1.03, Math.max(0, -dy));
+          this.drag.el.style.transform = 'translateY(' + off + 'px)';
+        }
+      }
+    };
+    this.onTE = (e) => {
+      if (this.tY == null) return;
+      const dy = this.tY - e.changedTouches[0].clientY;
+      const dt = Date.now() - this.tT;
+      this.tY = null;
+      if (this.drag) {
+        const d = this.drag; this.drag = null;
+        this.suppressClick = Date.now() + 500;
+        const H = window.innerHeight;
+        const moved = d.dir === 1 ? this.dragDy : -this.dragDy;
+        const fast = d.dir === 1 ? this.vel > 0.4 : this.vel < -0.4;
+        d.el.style.transition = '';
+        requestAnimationFrame(() => {
+          d.el.style.transform = '';
+          if (moved > H * 0.22 || fast) {
+            this.goTo(this.state.cur + d.dir, d.dir === -1);
+          }
+        });
+        this.lastDy = 0; this.vel = 0; this.dragDy = 0;
+        return;
+      }
+      if (Math.abs(dy) > 70 && dt < 400) this.gesture(dy > 0 ? 1 : -1, 999);
+    };
+    window.addEventListener('wheel', this.onWheel, { passive: true });
+    window.addEventListener('touchstart', this.onTS, { passive: true });
+    window.addEventListener('touchmove', this.onTM, { passive: false });
+    window.addEventListener('touchend', this.onTE, { passive: true });
+  }
+  componentWillUnmount() {
+    window.removeEventListener('wheel', this.onWheel);
+    window.removeEventListener('touchstart', this.onTS);
+    window.removeEventListener('touchmove', this.onTM);
+    window.removeEventListener('touchend', this.onTE);
+  }
+  scroller() { return document.querySelector('[data-sheet-i="' + this.state.cur + '"] [data-scroller]'); }
+  fmt(t) { if (!t || !isFinite(t)) return '0:00'; const m = Math.floor(t / 60), s = Math.floor(t % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
+  syncAudioSrc() {
+    const el = this.audio; if (!el) return;
+    const src = this.cases[this.state.caseIdx].audio || '';
+    if (src && el.getAttribute('src') !== src) el.setAttribute('src', src);
+    else if (!src && el.hasAttribute('src')) el.removeAttribute('src');
+  }
+  componentDidUpdate() { this.syncAudioSrc(); }
+  setAudioRef = (el) => {
+    this.audio = el;
+    if (el) this.syncAudioSrc();
+    if (el && !el._bmBound) {
+      el._bmBound = true;
+      el.addEventListener('timeupdate', () => this.setState({ audioCur: el.currentTime, audioDur: el.duration || 0 }));
+      el.addEventListener('loadedmetadata', () => this.setState({ audioDur: el.duration || 0 }));
+      el.addEventListener('ended', () => this.setState({ playing: false, audioCur: 0 }));
+    }
+  };
+  togglePlay = () => {
+    const a = this.audio;
+    if (!a || !a.getAttribute('src')) return;
+    if (a.paused) { a.play(); this.setState({ playing: true }); }
+    else { a.pause(); this.setState({ playing: false }); }
+  };
+  seek = (e) => {
+    const a = this.audio; if (!a || !a.duration) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    a.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * a.duration;
+  };
+  stopAudio = () => { if (this.audio) { try { this.audio.pause(); this.audio.currentTime = 0; } catch (e) {} } this.setState({ playing: false, audioCur: 0, audioDur: 0 }); };
+  setChatInput = (el) => { this.chatInput = el; };
+  setChatScroll = (el) => { this.chatScroll = el; };
+  scrollChat = () => { const el = this.chatScroll; if (el) el.scrollTop = el.scrollHeight; };
+  toggleChat = () => { this.setState(s => ({ chatOpen: !s.chatOpen }), () => { if (this.state.chatOpen) this.scrollChat(); }); };
+  closeChat = () => this.setState({ chatOpen: false });
+  chatKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendChat(); } };
+  sendChat = () => {
+    const el = this.chatInput; if (!el) return;
+    const text = (el.value || '').trim();
+    if (!text || this.state.chatLoading) return;
+    el.value = '';
+    const history = this.state.messages.concat([{ role: 'user', content: text }]);
+    this.setState({ messages: history, chatLoading: true }, this.scrollChat);
+    const fu = history.findIndex(m => m.role === 'user');
+    const api = history.slice(fu < 0 ? 0 : fu).map(m => ({ role: m.role, content: m.content }));
+    const system = 'Eres el asistente virtual de Breadman Studio, un estudio de diseño y dirección creativa con base en el Valle del Aconcagua, Chile, fundado por Fernando. Servicios: identidad visual y branding, diseño web, motion graphics, dirección creativa y diseño sonoro. Actúas como vendedor, asistente y secretario: resuelves dudas sobre los servicios, orientas presupuestos y ayudas a agendar o dejar contacto. Responde en español, en tono cercano, claro y breve (2-4 frases). Para precios exactos, pide detalles del proyecto (alcance, plazos) y ofrece coordinar una reunión o usar la sección Contacto. No inventes datos, clientes ni cifras que no conozcas.';
+    window.claude.complete({ system: system, max_tokens: 600, messages: api })
+      .then(reply => this.setState(s => ({ messages: s.messages.concat([{ role: 'assistant', content: String(reply || '').trim() || '¿Podrías darme un poco más de detalle?' }]), chatLoading: false }), this.scrollChat))
+      .catch(() => this.setState(s => ({ messages: s.messages.concat([{ role: 'assistant', content: 'Uy, tuve un problema para responder. Escríbenos por la sección Contacto y te contactamos pronto.' }]), chatLoading: false }), this.scrollChat));
+  };
+  gesture(dir, mag) {
+    const s = this.state;
+    if (s.menu || s.caseOpen || s.chatOpen) return;
+    if (Date.now() < this.lockUntil) return;
+    if (mag < 40) return;
+    const sc = this.scroller();
+    if (dir > 0) {
+      if (sc && sc.scrollHeight - sc.scrollTop - sc.clientHeight > 4) return;
+      this.goTo(s.cur + 1);
+    } else {
+      if (sc && sc.scrollTop > 4) return;
+      this.goTo(s.cur - 1, true);
+    }
+  }
+  goTo(i, backwards) {
+    const min = this.state.visited ? 1 : 0;
+    if (i < min || i > 5 || i === this.state.cur) return;
+    this.lockUntil = Date.now() + 550;
+    const st = { cur: i };
+    if (i >= 1 && !this.state.visited) {
+      st.visited = true;
+      try { sessionStorage.setItem('bm-visited', '1'); } catch (e) {}
+    }
+    this.setState(st, () => {
+      const sc = this.scroller();
+      if (sc) sc.scrollTop = backwards ? sc.scrollHeight : 0;
+    });
+  }
+  menuGo(i) {
+    this.setState({ menu: false });
+    setTimeout(() => { this.lockUntil = 0; this.goTo(i); }, 250);
+  }
+  renderVals() {
+    const s = this.state, c = s.cur;
+    const vals = {};
+    for (let i = 0; i < 6; i++) { vals['s' + i] = i <= c; vals['a' + i] = i === c; }
+    const stripeH = (this.props.stripeHeight ?? 9) + 'px';
+    for (let i = 2; i <= 5; i++) { vals['h' + i] = i <= c ? '0px' : stripeH; }
+    vals.stripesOpacity = (c === 0 || c === 5) ? 0 : 1;
+    const cs = this.cases[s.caseIdx];
+    const menuColors = ['cHome', 'cTrabajos', 'cQue', 'cSobre', 'cContacto'];
+    menuColors.forEach((k, idx) => { vals[k] = (idx + 1 === c) ? '#D9B395' : '#899EAA'; });
+    vals.waLink = 'https://wa.me/' + String(this.props.whatsapp ?? '56912345678').replace(/[^0-9]/g, '');
+    const dur = s.audioDur || 0, curT = s.audioCur || 0;
+    vals.caseAudio = cs.audio || '';
+    vals.hasAudio = !!cs.audio;
+    vals.playing = s.playing;
+    vals.notPlaying = !s.playing;
+    vals.audioPct = (dur ? (curT / dur) * 100 : 0) + '%';
+    vals.audioCurLabel = this.fmt(curT);
+    vals.audioDurLabel = this.fmt(dur);
+    const accents = ['#899EAA', '#D9B395', '#B7D0DE', '#D9B395', '#899EAA', '#899EAA'];
+    vals.botColor = s.caseOpen ? '#C9D6DE' : (accents[c] || '#899EAA');
+    vals.chatFabShow = c !== 0 && !s.menu && !s.caseOpen;
+    vals.chatOpen = s.chatOpen;
+    vals.chatLoading = s.chatLoading;
+    vals.chatMsgs = s.messages.map(m => ({
+      text: m.content,
+      align: m.role === 'user' ? 'flex-end' : 'flex-start',
+      bg: m.role === 'user' ? '#899EAA' : 'rgba(255,255,255,.07)',
+      color: m.role === 'user' ? '#16191c' : '#DDE6EA'
+    }));
+    return Object.assign(vals, {
+      menuOpen: s.menu,
+      toggleChat: this.toggleChat,
+      closeChat: this.closeChat,
+      sendChat: this.sendChat,
+      chatKey: this.chatKey,
+      setChatInput: this.setChatInput,
+      setChatScroll: this.setChatScroll,
+      caseOpen: s.caseOpen,
+      caseTitle: cs.title, caseTags: cs.tags, caseDesc: cs.desc, caseMade: cs.made,
+      sent: s.sent, sending: s.sending,
+      sendLabel: 'Enviar',
+      enter: () => { this.goTo(1); },
+      goHome: () => { this.setState({ menu: false, caseOpen: false }); this.lockUntil = 0; this.goTo(1); },
+      goTrabajos: () => { this.goTo(2); },
+      goNext: () => { if (Date.now() >= this.lockUntil && Date.now() >= (this.suppressClick || 0)) this.goTo(this.state.cur + 1); },
+      openMenu: () => this.setState({ menu: true }),
+      closeMenu: () => this.setState({ menu: false }),
+      menuHome: () => this.menuGo(1),
+      menuTrabajos: () => this.menuGo(2),
+      menuQue: () => this.menuGo(3),
+      menuSobre: () => this.menuGo(4),
+      menuContacto: () => this.menuGo(5),
+      togglePlay: this.togglePlay,
+      seek: this.seek,
+      setAudioRef: this.setAudioRef,
+      openAustral: () => { this.stopAudio(); this.setState({ caseOpen: true, caseIdx: 0 }); },
+      openNiukid: () => { this.stopAudio(); this.setState({ caseOpen: true, caseIdx: 1 }); },
+      closeCase: () => { this.stopAudio(); this.setState({ caseOpen: false }); },
+      prevCase: () => { this.stopAudio(); this.setState({ caseIdx: (s.caseIdx + 1) % 2 }); },
+      nextCase: () => { this.stopAudio(); this.setState({ caseIdx: (s.caseIdx + 1) % 2 }); },
+      send: (e) => {
+        const btn = e.currentTarget;
+        btn.style.animation = 'bmBtnPulse 500ms ease-in-out';
+        setTimeout(() => { btn.style.animation = ''; }, 500);
+        this.setState({ sent: true });
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>

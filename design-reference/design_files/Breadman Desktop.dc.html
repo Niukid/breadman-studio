@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,700;1,100;1,200;1,300;1,400;1,500&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#101010;height:100%}
+*{box-sizing:border-box}
+a{color:#899EAA;text-decoration:none}a:hover{color:#B7D0DE}
+[data-sec]{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity 850ms ease;z-index:1;scrollbar-width:none;display:flex;flex-direction:column}
+[data-sec]::-webkit-scrollbar{display:none}
+[data-sec][data-active="true"]{opacity:1;pointer-events:auto;z-index:2}
+input::placeholder,textarea::placeholder{color:#5F7884;font-family:'JetBrains Mono',monospace}
+[data-introdot]{opacity:0;transition:opacity 650ms ease}
+[data-introbtn]:hover [data-introdot]{opacity:1}
+[data-pill]{background:none;cursor:pointer;border-radius:999px;padding:11px 28px;font-family:'JetBrains Mono',monospace;font-size:15px;transition:background 250ms ease,color 250ms ease,border-color 250ms ease}
+[data-case]{opacity:0;pointer-events:none;transition:opacity 500ms ease}
+[data-case][data-open="true"]{opacity:1;pointer-events:auto}
+[data-case] [data-scroller]{scrollbar-width:none}[data-case] [data-scroller]::-webkit-scrollbar{display:none}
+[data-chat]{opacity:0;transform:translateY(12px) scale(.98);pointer-events:none;transition:opacity 260ms ease,transform 260ms ease}
+[data-chat][data-open="true"]{opacity:1;transform:none;pointer-events:auto}
+[data-chat] [data-scroller]{scrollbar-width:none}[data-chat] [data-scroller]::-webkit-scrollbar{display:none}
+@keyframes bmBtnPulse{0%,100%{transform:scale(1)}50%{transform:scale(0.95)}}
+@keyframes bmHomeBg{0%{background-color:#732706}20%{background-color:#5F7884}40%{background-color:#6F4B52}60%{background-color:#283035}80%{background-color:#B65534}100%{background-color:#732706}}
+</style>
+<script src="image-slot.js"></script>
+</helmet>
+
+<div style="position:fixed;inset:0;overflow:hidden;background:#101010;font-family:'JetBrains Mono',monospace">
+
+  <!-- 0 · INICIO -->
+  <section data-sec data-active="{{ a0 }}" style="background:#283035;animation:bmHomeBg 60s ease-in-out infinite">
+    <div style="min-height:100%;display:flex;align-items:center;justify-content:center;padding:60px">
+      <div style="display:flex;align-items:center;gap:72px;flex-wrap:wrap;justify-content:center">
+        <div style="display:flex;flex-direction:column;gap:9px;line-height:1">
+          <dc-import name="BmLogo" color="#899EAA" w="210px" fs="15px" ls="1.12em" hint-size="210px,88px"></dc-import>
+        </div>
+        <button data-introbtn onClick="{{ enter }}" aria-label="Entrar" style="background:none;border:none;padding:0;cursor:pointer">
+          <svg viewBox="0 0 200 200" style="width:240px;display:block">
+            <circle cx="100" cy="100" r="97" fill="none" stroke="#899EAA" stroke-width="1" opacity="0.4"></circle>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="#899EAA" stroke-width="1" opacity="0.6"></circle>
+            <circle cx="100" cy="100" r="75" fill="none" stroke="#899EAA" stroke-width="1" opacity="0.9"></circle>
+            <circle data-introdot cx="100" cy="100" r="66" fill="#899EAA"></circle>
+          </svg>
+        </button>
+        <div style="font-size:16px;letter-spacing:0.34em;color:#899EAA">Estudio de diseño</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1 · HOME -->
+  <section data-sec data-active="{{ a1 }}" style="background:#732706;animation:bmHomeBg 60s ease-in-out infinite">
+    <div style="width:100%;height:100%;max-height:800px;margin:auto;display:flex;flex-direction:column">
+    <nav style="display:flex;justify-content:space-between;align-items:center;padding:32px max(56px, calc((100% - 1440px) / 2));background:#732706;animation:bmHomeBg 60s ease-in-out infinite">
+      <button onClick="{{ goHome }}" aria-label="Inicio" style="background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;line-height:1">
+        <dc-import name="BmLogo" color="#B7D0DE" w="128px" fs="10px" ls="0.86em" hint-size="128px,54px"></dc-import>
+      </button>
+      <div style="display:flex;gap:44px;align-items:center">
+        <button data-navlink onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#B7D0DE">Home</button>
+        <button data-navlink onClick="{{ goTrabajos }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Trabajos</button>
+        <button data-navlink onClick="{{ goQue }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Qué hacemos</button>
+        <button data-navlink onClick="{{ goSobre }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Sobre Breadman</button>
+        <button data-navlink onClick="{{ goContacto }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Contacto</button>
+      </div>
+    </nav>
+    <div style="flex:1;padding:40px max(56px, calc((100% - 1440px) / 2)) 90px;display:flex;flex-direction:column;justify-content:center">
+      <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#B7D0DE;font-size:70px;line-height:1.03;letter-spacing:.005em;margin:0">DISEÑO—MOTION<br>WEB—SONIDO</h1>
+      <p style="font-family:'JetBrains Mono',monospace;color:rgba(183,208,222,.85);font-size:17px;line-height:1.6;margin:32px 0 0;max-width:520px">Marcas que funcionan en imagen,<br>movimiento y sonido.</p>
+      <button onClick="{{ goTrabajos }}" style="margin-top:32px;align-self:flex-start;font-family:'JetBrains Mono',monospace;color:#899EAA;background:none;border:1px solid #899EAA;border-radius:999px;padding:16px 48px;font-size:16px;cursor:pointer;transition:background 250ms ease,color 250ms ease" style-hover="background:#899EAA;color:#283035">Ver Trabajos</button>
+    </div>
+    </div>
+  </section>
+
+  <!-- 2 · TRABAJOS -->
+  <section data-sec data-active="{{ a2 }}" style="background:#5F7884">
+    <div style="width:100%;height:100%;max-height:800px;margin:auto;display:flex;flex-direction:column">
+    <nav style="display:flex;justify-content:space-between;align-items:center;padding:32px max(56px, calc((100% - 1440px) / 2));background:#5F7884">
+      <button onClick="{{ goHome }}" aria-label="Inicio" style="background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;line-height:1">
+        <dc-import name="BmLogo" color="#C9DCE6" w="128px" fs="10px" ls="0.86em" hint-size="128px,54px"></dc-import>
+      </button>
+      <div style="display:flex;gap:44px;align-items:center">
+        <button data-navlink onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(201,220,230,.55)" style-hover="color:#C9DCE6">Home</button>
+        <button data-navlink onClick="{{ goTrabajos }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#C9DCE6">Trabajos</button>
+        <button data-navlink onClick="{{ goQue }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(201,220,230,.55)" style-hover="color:#C9DCE6">Qué hacemos</button>
+        <button data-navlink onClick="{{ goSobre }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(201,220,230,.55)" style-hover="color:#C9DCE6">Sobre Breadman</button>
+        <button data-navlink onClick="{{ goContacto }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(201,220,230,.55)" style-hover="color:#C9DCE6">Contacto</button>
+      </div>
+    </nav>
+    <div style="flex:1;padding:20px max(56px, calc((100% - 1440px) / 2)) 26px;display:flex;flex-direction:column;justify-content:center">
+      <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#C9DCE6;font-size:50px;line-height:1.05;margin:0">TRABAJOS</h1>
+      <p style="font-family:'JetBrains Mono',monospace;color:rgba(201,220,230,.9);font-size:16px;line-height:1.6;margin:20px 0 0;max-width:640px">Casos de diseño, branding, web y motion. Sectores: arquitectura, salud, finanzas, música y cultura.</p>
+      <div style="display:flex;gap:14px;margin:20px 0 24px;flex-wrap:wrap">
+        <button data-pill data-active="{{ fAll }}" onClick="{{ setAll }}" style="color:#C9DCE6;border:1px solid rgba(201,220,230,.55)">Todo</button>
+        <button data-pill data-active="{{ fBranding }}" onClick="{{ setBranding }}" style="color:#C9DCE6;border:1px solid rgba(201,220,230,.55)">Branding</button>
+        <button data-pill data-active="{{ fWeb }}" onClick="{{ setWeb }}" style="color:#C9DCE6;border:1px solid rgba(201,220,230,.55)">Web</button>
+        <button data-pill data-active="{{ fAudio }}" onClick="{{ setAudio }}" style="color:#C9DCE6;border:1px solid rgba(201,220,230,.55)">Audio</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+        <sc-for list="{{ visibleCases }}" as="c" hint-placeholder-count="5">
+          <div onClick="{{ c.open }}" style="background:#263038;border-radius:16px;aspect-ratio:1.85;display:flex;flex-direction:column;justify-content:flex-end;padding:24px;cursor:pointer;transition:transform 300ms ease,background 300ms ease" style-hover="transform:translateY(-5px);background:#2C3841">
+            <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#B7D0DE;font-size:22px">{{ c.title }}</div>
+            <div style="font-family:'JetBrains Mono',monospace;color:rgba(183,208,222,.6);font-size:14px;margin-top:9px">{{ c.tags }}</div>
+          </div>
+        </sc-for>
+        <div style="border:1px dashed rgba(201,220,230,.5);border-radius:16px;aspect-ratio:1.85;display:flex;align-items:center;justify-content:center;color:rgba(201,220,230,.7);font-family:'JetBrains Mono',monospace;font-size:15px">+ próximos casos</div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- 3 · QUÉ HACEMOS -->
+  <section data-sec data-active="{{ a3 }}" style="background:#B65534">
+    <div style="width:100%;height:100%;max-height:800px;margin:auto;display:flex;flex-direction:column">
+    <nav style="display:flex;justify-content:space-between;align-items:center;padding:32px max(56px, calc((100% - 1440px) / 2));background:#B65534">
+      <button onClick="{{ goHome }}" aria-label="Inicio" style="background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;line-height:1">
+        <dc-import name="BmLogo" color="#E7CBAD" w="128px" fs="10px" ls="0.86em" hint-size="128px,54px"></dc-import>
+      </button>
+      <div style="display:flex;gap:44px;align-items:center">
+        <button data-navlink onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(231,203,173,.55)" style-hover="color:#E7CBAD">Home</button>
+        <button data-navlink onClick="{{ goTrabajos }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(231,203,173,.55)" style-hover="color:#E7CBAD">Trabajos</button>
+        <button data-navlink onClick="{{ goQue }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#E7CBAD">Qué hacemos</button>
+        <button data-navlink onClick="{{ goSobre }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(231,203,173,.55)" style-hover="color:#E7CBAD">Sobre Breadman</button>
+        <button data-navlink onClick="{{ goContacto }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(231,203,173,.55)" style-hover="color:#E7CBAD">Contacto</button>
+      </div>
+    </nav>
+    <div style="flex:1;padding:18px max(56px, calc((100% - 1440px) / 2)) 24px;display:flex;flex-direction:column;justify-content:center">
+      <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#E7CBAD;font-size:46px;line-height:1.05;margin:0">QUÉ HACEMOS</h1>
+      <p style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.9);font-size:16px;line-height:1.6;margin:20px 0 0">Servicios integrados según lo que necesite la marca.</p>
+      <div style="margin-top:22px;border-top:1px solid rgba(231,203,173,.26)">
+        <div style="display:grid;grid-template-columns:64px 1fr 430px;gap:28px;align-items:start;padding:18px 0;border-bottom:1px solid rgba(231,203,173,.26)">
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.6);font-size:18px">01</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#E7CBAD;font-size:26px;line-height:1.15">Identidad visual y branding</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.82);font-size:15px;line-height:1.55;padding-top:9px">Marcas desde cero o rediseños: logo, sistema, aplicaciones.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:64px 1fr 430px;gap:28px;align-items:start;padding:18px 0;border-bottom:1px solid rgba(231,203,173,.26)">
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.6);font-size:18px">02</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#E7CBAD;font-size:26px;line-height:1.15">Diseño web</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.82);font-size:15px;line-height:1.55;padding-top:9px">Sitios que se ven bien y funcionan: portafolios, marcas, e-commerce.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:64px 1fr 430px;gap:28px;align-items:start;padding:18px 0;border-bottom:1px solid rgba(231,203,173,.26)">
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.6);font-size:18px">03</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#E7CBAD;font-size:26px;line-height:1.15">Motion graphics</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.82);font-size:15px;line-height:1.55;padding-top:9px">Piezas en movimiento para redes, web y presentaciones.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:64px 1fr 430px;gap:28px;align-items:start;padding:18px 0;border-bottom:1px solid rgba(231,203,173,.26)">
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.6);font-size:18px">04</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#E7CBAD;font-size:26px;line-height:1.15">Dirección creativa</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.82);font-size:15px;line-height:1.55;padding-top:9px">La mirada completa: concepto, estética y coherencia de principio a fin.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:64px 1fr 430px;gap:28px;align-items:start;padding:18px 0;border-bottom:1px solid rgba(231,203,173,.26)">
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.6);font-size:18px">05</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#E7CBAD;font-size:26px;line-height:1.15">Diseño sonoro</div>
+          <div style="font-family:'JetBrains Mono',monospace;color:rgba(231,203,173,.82);font-size:15px;line-height:1.55;padding-top:9px">Identidad de audio, música para piezas audiovisuales, logo sonoro.</div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- 4 · SOBRE BREADMAN -->
+  <section data-sec data-active="{{ a4 }}" style="background:#6F4B52">
+    <img src="assets/sobre-fondo.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;pointer-events:none">
+    <div style="width:100%;height:100%;max-height:800px;margin:auto;display:flex;flex-direction:column">
+    <nav style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:32px max(56px, calc((100% - 1440px) / 2));background:#6F4B52">
+      <button onClick="{{ goHome }}" aria-label="Inicio" style="background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;line-height:1">
+        <dc-import name="BmLogo" color="#C6D2DB" w="128px" fs="10px" ls="0.86em" hint-size="128px,54px"></dc-import>
+      </button>
+      <div style="display:flex;gap:44px;align-items:center">
+        <button data-navlink onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(198,210,219,.55)" style-hover="color:#C6D2DB">Home</button>
+        <button data-navlink onClick="{{ goTrabajos }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(198,210,219,.55)" style-hover="color:#C6D2DB">Trabajos</button>
+        <button data-navlink onClick="{{ goQue }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(198,210,219,.55)" style-hover="color:#C6D2DB">Qué hacemos</button>
+        <button data-navlink onClick="{{ goSobre }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#C6D2DB">Sobre Breadman</button>
+        <button data-navlink onClick="{{ goContacto }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(198,210,219,.55)" style-hover="color:#C6D2DB">Contacto</button>
+      </div>
+    </nav>
+    <div style="position:relative;z-index:1;flex:1;padding:20px max(56px, calc((100% - 1440px) / 2)) 30px;max-width:none;display:flex;flex-direction:column;justify-content:center">
+      <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#C6D2DB;font-size:50px;line-height:1.05;margin:0 0 30px">SOBRE BREADMAN</h1>
+      <p style="font-family:'JetBrains Mono',monospace;color:rgba(198,210,219,.92);font-size:16px;line-height:1.7;margin:0 0 22px;max-width:780px">Breadman es un estudio de diseño y dirección creativa fundado por Fernando, con base en el Valle del Aconcagua. Trabajamos en identidad visual, branding, web design, motion graphics y sonido — todo integrado como una sola disciplina.</p>
+      <p style="font-family:'JetBrains Mono',monospace;color:rgba(198,210,219,.92);font-size:16px;line-height:1.7;margin:0;max-width:780px">Venimos de años de trabajo en sectores distintos: arquitectura, salud, finanzas y cultura. Creemos que las marcas fuertes se construyen con método, criterio y las manos en el barro. Sin sobreproducciones, sin jerga. Bien hechas y a tiempo.</p>
+    </div>
+    </div>
+  </section>
+
+  <!-- 5 · CONTACTO -->
+  <section data-sec data-active="{{ a5 }}" style="background:#283035">
+    <div style="width:100%;height:100%;max-height:800px;margin:auto;display:flex;flex-direction:column">
+    <nav style="display:flex;justify-content:space-between;align-items:center;padding:32px max(56px, calc((100% - 1440px) / 2));background:#283035">
+      <button onClick="{{ goHome }}" aria-label="Inicio" style="background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;line-height:1">
+        <dc-import name="BmLogo" color="#B7D0DE" w="128px" fs="10px" ls="0.86em" hint-size="128px,54px"></dc-import>
+      </button>
+      <div style="display:flex;gap:44px;align-items:center">
+        <button data-navlink onClick="{{ goHome }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Home</button>
+        <button data-navlink onClick="{{ goTrabajos }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Trabajos</button>
+        <button data-navlink onClick="{{ goQue }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Qué hacemos</button>
+        <button data-navlink onClick="{{ goSobre }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:400;color:rgba(183,208,222,.5)" style-hover="color:#B7D0DE">Sobre Breadman</button>
+        <button data-navlink onClick="{{ goContacto }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;color:#B7D0DE">Contacto</button>
+      </div>
+    </nav>
+    <div style="padding:40px max(56px, calc((100% - 1440px) / 2)) 0;display:grid;grid-template-columns:1fr 1fr;gap:90px;align-items:start;flex:1">
+      <div style="display:flex;flex-direction:column;height:100%">
+        <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#B7D0DE;font-size:52px;line-height:1.05;margin:0">CONTACTO</h1>
+        <p style="font-family:'JetBrains Mono',monospace;color:rgba(183,208,222,.85);font-size:16px;line-height:1.6;margin:22px 0 0">¿Proyecto nuevo? Cuéntanos.<br>Respondemos rápido.</p>
+        <div style="padding-top:80px;font-family:'JetBrains Mono',monospace;color:rgba(183,208,222,.85);font-size:15px">Email directo · Instagram · Facebook</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <input placeholder="Nombre" style="background:none;border:1px solid rgba(137,158,170,.55);border-radius:12px;padding:14px 22px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#B7D0DE;outline:none">
+        <input placeholder="Email" style="background:none;border:1px solid rgba(137,158,170,.55);border-radius:12px;padding:14px 22px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#B7D0DE;outline:none">
+        <input placeholder="Tipo de proyecto" style="background:none;border:1px solid rgba(137,158,170,.55);border-radius:12px;padding:14px 22px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#B7D0DE;outline:none">
+        <textarea placeholder="Mensaje" rows="4" style="background:none;border:1px solid rgba(137,158,170,.55);border-radius:12px;padding:14px 22px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#B7D0DE;outline:none;resize:none"></textarea>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:6px">
+          <button onClick="{{ send }}" style="background:none;border:1px solid rgba(137,158,170,.7);border-radius:999px;padding:16px 44px;font-family:'JetBrains Mono',monospace;font-size:15px;color:#B7D0DE;cursor:pointer;transition:background 250ms ease,color 250ms ease" style-hover="background:#899EAA;color:#283035">Enviar</button>
+          <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}"><span style="color:rgba(183,208,222,.8);font-size:13px">Recibido. Te respondemos pronto.</span></sc-if>
+        </div>
+      </div>
+    </div>
+    <footer style="text-align:center;flex:none;padding:34px max(56px, calc((100% - 1440px) / 2)) 26px;font-family:'JetBrains Mono',monospace;color:rgba(183,208,222,.5);font-size:14px">Hecho con método y tiempo © 2026 Breadman.Studio</footer>
+    </div>
+  </section>
+
+  <!-- VER TRABAJO (plantilla) -->
+  <div data-case data-open="{{ caseOpen }}" style="position:absolute;inset:0;z-index:60;background:#101010">
+    <image-slot id="{{ caseBgId }}" shape="rect" fit="cover" placeholder="Imagen de fondo (pantalla completa)" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+    <div style="position:absolute;inset:0;background:rgba(16,16,16,.6);pointer-events:none"></div>
+    <div data-scroller style="position:absolute;top:0;bottom:0;left:0;right:0;margin:auto;width:min(1440px,100%);height:min(800px,100%);overflow-y:auto;display:flex;flex-direction:column;padding:0 56px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:28px 0;flex:none">
+        <button onClick="{{ caseHome }}" aria-label="Inicio" style="background:none;border:none;padding:0;cursor:pointer;display:flex;flex-direction:column;gap:5px;line-height:1">
+          <dc-import name="BmLogo" color="#C9D6DE" w="128px" fs="10px" ls="0.86em" hint-size="128px,54px"></dc-import>
+        </button>
+        <button onClick="{{ closeCase }}" aria-label="Cerrar" style="background:none;border:none;padding:6px;cursor:pointer"><svg viewBox="0 0 24 24" style="width:36px" stroke="#C9D6DE" stroke-width="1" fill="none"><path d="M4 4l16 16M20 4L4 20"></path></svg></button>
+      </div>
+      <div style="position:relative;flex:1;min-height:170px;border-radius:18px;overflow:hidden;margin:0"><image-slot id="{{ caseBoxId }}" shape="rect" fit="cover" placeholder="Imagen del trabajo" style="position:absolute;inset:0;width:100%;height:100%"></image-slot></div>
+      <div style="position:relative;padding:24px 0 0;max-width:920px">
+        <h1 style="font-family:'JetBrains Mono',monospace;font-style:italic;font-weight:200;color:#C9D6DE;font-size:44px;line-height:1.05;margin:0">{{ caseTitle }}</h1>
+        <div style="font-family:'JetBrains Mono',monospace;color:rgba(201,214,222,.6);font-size:15px;margin:24px 0 20px">{{ caseTags }}</div>
+        <div style="font-family:'JetBrains Mono',monospace;color:rgba(201,214,222,.85);font-size:16px;line-height:1.6;margin-bottom:30px">{{ caseDesc }}</div>
+        <sc-if value="{{ hasAudio }}" hint-placeholder-val="{{ false }}">
+          <div style="border:1px solid rgba(201,214,222,.4);border-radius:14px;padding:16px 20px;margin-bottom:32px;max-width:520px">
+            <div style="color:rgba(201,214,222,.55);font-size:10px;letter-spacing:.16em;margin-bottom:13px">DISEÑO SONORO</div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <button onClick="{{ togglePlay }}" aria-label="Reproducir" style="flex:none;width:46px;height:46px;border-radius:50%;border:1px solid #C9D6DE;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 250ms ease" style-hover="background:rgba(201,214,222,.12)">
+                <sc-if value="{{ playing }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" style="width:16px" fill="#C9D6DE"><rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect></svg></sc-if>
+                <sc-if value="{{ notPlaying }}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" style="width:16px;margin-left:2px" fill="#C9D6DE"><path d="M7 4v16l13-8z"></path></svg></sc-if>
+              </button>
+              <div style="flex:1;min-width:0">
+                <div onClick="{{ seek }}" style="height:6px;border-radius:3px;background:rgba(201,214,222,.22);cursor:pointer;overflow:hidden"><div style="height:100%;width:{{ audioPct }};background:#C9D6DE"></div></div>
+                <div style="display:flex;justify-content:space-between;color:rgba(201,214,222,.5);font-size:11px;margin-top:8px"><span>{{ audioCurLabel }}</span><span>{{ audioDurLabel }}</span></div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+        <audio ref="{{ setAudioRef }}" preload="metadata" style="display:none"></audio>
+        <a href="{{ caseUrl }}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;color:#C9D6DE;border:1px solid rgba(201,214,222,.7);border-radius:999px;padding:15px 32px;transition:background 250ms ease,color 250ms ease" style-hover="background:#C9D6DE;color:#101010">Visitar Sitio ↗</a>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 0 22px;flex:none">
+        <div style="font-family:'JetBrains Mono',monospace;color:rgba(201,214,222,.5);font-size:13px">al scrollear: galería por bloques, tipo lámina · audio del caso</div>
+        <div style="display:flex;gap:40px">
+          <button onClick="{{ prevCase }}" style="background:none;border:none;color:#C9D6DE;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;cursor:pointer;padding:0;transition:opacity 250ms ease" style-hover="opacity:.65">← Anterior</button>
+          <button onClick="{{ nextCase }}" style="background:none;border:none;color:#C9D6DE;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;cursor:pointer;padding:0;transition:opacity 250ms ease" style-hover="opacity:.65">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASISTENTE / CHAT (reemplaza WhatsApp) — color según sección -->
+  <button onClick="{{ toggleChat }}" aria-label="Abrir chat asistente" style="position:absolute;right:34px;bottom:34px;z-index:72;width:60px;height:60px;border-radius:50%;background:{{ botColor }};display:flex;align-items:center;justify-content:center;box-shadow:0 8px 26px rgba(0,0,0,.4);cursor:pointer;border:none;transition:transform 250ms ease,background 500ms ease" style-hover="transform:scale(1.09)"><svg viewBox="0 0 24 24" style="width:28px" fill="none" stroke="#16191c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.9-.9L3 21l1.9-5.1A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"></path><path d="M8.4 12h.01M12 12h.01M15.6 12h.01"></path></svg></button>
+
+  <div data-chat data-open="{{ chatOpen }}" style="position:absolute;right:34px;bottom:108px;z-index:72;width:360px;max-width:calc(100% - 48px);height:470px;max-height:calc(100% - 150px);display:flex;flex-direction:column;background:#1b1f23;border:1px solid {{ botColor }};border-radius:18px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.55)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:{{ botColor }};transition:background 500ms ease">
+      <div style="display:flex;flex-direction:column;line-height:1.2">
+        <span style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:14px;color:#16191c">Asistente Breadman</span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:rgba(22,25,28,.68)">Ventas · consultas · agenda</span>
+      </div>
+      <button onClick="{{ closeChat }}" aria-label="Cerrar chat" style="background:none;border:none;cursor:pointer;padding:4px;display:flex"><svg viewBox="0 0 24 24" style="width:20px" stroke="#16191c" stroke-width="2" fill="none"><path d="M5 5l14 14M19 5L5 19"></path></svg></button>
+    </div>
+    <div ref="{{ setChatScroll }}" data-scroller style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px">
+      <sc-for list="{{ chatMsgs }}" as="m" hint-placeholder-count="1">
+        <div style="align-self:{{ m.align }};max-width:82%;background:{{ m.bg }};color:{{ m.color }};padding:9px 13px;border-radius:13px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5;white-space:pre-wrap">{{ m.text }}</div>
+      </sc-for>
+      <sc-if value="{{ chatLoading }}" hint-placeholder-val="{{ false }}">
+        <div style="align-self:flex-start;background:rgba(255,255,255,.07);color:#9fb0b8;padding:9px 13px;border-radius:13px;font-family:'JetBrains Mono',monospace;font-size:13px">escribiendo…</div>
+      </sc-if>
+    </div>
+    <div style="display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.08)">
+      <input ref="{{ setChatInput }}" onKeyDown="{{ chatKey }}" placeholder="Escribe tu consulta…" style="flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:11px 13px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#DDE6EA;outline:none">
+      <button onClick="{{ sendChat }}" aria-label="Enviar" style="flex:none;width:42px;border-radius:10px;background:{{ botColor }};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 500ms ease"><svg viewBox="0 0 24 24" style="width:18px" fill="#16191c"><path d="M3 20l18-8L3 4v6l12 2-12 2z"></path></svg></button>
+    </div>
+  </div>
+
+</div>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#283035"></rect><circle cx="50" cy="50" r="22" fill="none" stroke="#899EAA" stroke-width="2"></circle><circle cx="50" cy="50" r="14" fill="#899EAA"></circle></svg></template>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;alwaysShowIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Navegación&quot;},&quot;whatsapp&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contacto&quot;}}">
+class Component extends DCLogic {
+  constructor(p) {
+    super(p);
+    let visited = false;
+    try { visited = !!sessionStorage.getItem('bm-d-visited'); } catch (e) {}
+    if (this.props.alwaysShowIntro) visited = false;
+    this.state = { sec: visited ? 1 : 0, filter: 'all', caseOpen: false, caseIdx: 0, sent: false, playing: false, audioCur: 0, audioDur: 0,
+      chatOpen: false, chatLoading: false,
+      messages: [{ role: 'assistant', content: 'Hola, soy el asistente de Breadman Studio. Te ayudo con servicios, presupuestos o a coordinar una reunión. ¿Qué tienes en mente?' }] };
+    this.cases = [
+      { title: 'Austral Arquitectura', tags: 'branding · web', cats: ['branding', 'web'], desc: 'Descripción corta: el brief, el problema (2-4 líneas).', url: '#', audio: '' },
+      { title: 'Niukid', tags: 'identidad · motion · sonido', cats: ['branding', 'audio'], desc: 'Descripción corta: el brief, el problema (2-4 líneas).', url: '#', audio: '' },
+      { title: 'Claroscuro Records', tags: 'identidad · sonido', cats: ['branding', 'audio'], desc: 'Descripción corta: el brief, el problema (2-4 líneas).', url: '#', audio: '' },
+      { title: 'RQ Medical', tags: 'branding · ilustración', cats: ['branding'], desc: 'Descripción corta: el brief, el problema (2-4 líneas).', url: '#', audio: '' },
+      { title: 'Campo Capital', tags: 'branding · web', cats: ['branding', 'web'], desc: 'Descripción corta: el brief, el problema (2-4 líneas).', url: '#', audio: '' }
+    ];
+  }
+  goTo(i) {
+    if (i === this.state.sec) return;
+    if (i >= 1) { try { sessionStorage.setItem('bm-d-visited', '1'); } catch (e) {} }
+    this.setState({ sec: i }, () => {
+      const el = document.querySelectorAll('[data-sec]')[i];
+      if (el) el.scrollTop = 0;
+    });
+  }
+  fmt(t) { if (!t || !isFinite(t)) return '0:00'; const m = Math.floor(t / 60), s = Math.floor(t % 60); return m + ':' + (s < 10 ? '0' : '') + s; }
+  syncAudioSrc() {
+    const el = this.audio; if (!el) return;
+    const src = this.cases[this.state.caseIdx].audio || '';
+    if (src && el.getAttribute('src') !== src) el.setAttribute('src', src);
+    else if (!src && el.hasAttribute('src')) el.removeAttribute('src');
+  }
+  componentDidUpdate() { this.syncAudioSrc(); }
+  setAudioRef = (el) => {
+    this.audio = el;
+    if (el) this.syncAudioSrc();
+    if (el && !el._bmBound) {
+      el._bmBound = true;
+      el.addEventListener('timeupdate', () => this.setState({ audioCur: el.currentTime, audioDur: el.duration || 0 }));
+      el.addEventListener('loadedmetadata', () => this.setState({ audioDur: el.duration || 0 }));
+      el.addEventListener('ended', () => this.setState({ playing: false, audioCur: 0 }));
+    }
+  };
+  togglePlay = () => {
+    const a = this.audio;
+    if (!a || !a.getAttribute('src')) return;
+    if (a.paused) { a.play(); this.setState({ playing: true }); }
+    else { a.pause(); this.setState({ playing: false }); }
+  };
+  seek = (e) => {
+    const a = this.audio; if (!a || !a.duration) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    a.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * a.duration;
+  };
+  stopAudio = () => { if (this.audio) { try { this.audio.pause(); this.audio.currentTime = 0; } catch (e) {} } this.setState({ playing: false, audioCur: 0, audioDur: 0 }); };
+  openCase = (idx) => { this.stopAudio(); this.setState({ caseOpen: true, caseIdx: idx }); };
+  setChatInput = (el) => { this.chatInput = el; };
+  setChatScroll = (el) => { this.chatScroll = el; };
+  scrollChat = () => { const el = this.chatScroll; if (el) el.scrollTop = el.scrollHeight; };
+  toggleChat = () => { this.setState(s => ({ chatOpen: !s.chatOpen }), () => { if (this.state.chatOpen) this.scrollChat(); }); };
+  closeChat = () => this.setState({ chatOpen: false });
+  chatKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.sendChat(); } };
+  sendChat = () => {
+    const el = this.chatInput; if (!el) return;
+    const text = (el.value || '').trim();
+    if (!text || this.state.chatLoading) return;
+    el.value = '';
+    const history = this.state.messages.concat([{ role: 'user', content: text }]);
+    this.setState({ messages: history, chatLoading: true }, this.scrollChat);
+    const fu = history.findIndex(m => m.role === 'user');
+    const api = history.slice(fu < 0 ? 0 : fu).map(m => ({ role: m.role, content: m.content }));
+    const system = 'Eres el asistente virtual de Breadman Studio, un estudio de diseño y dirección creativa con base en el Valle del Aconcagua, Chile, fundado por Fernando. Servicios: identidad visual y branding, diseño web, motion graphics, dirección creativa y diseño sonoro. Actúas como vendedor, asistente y secretario: resuelves dudas sobre los servicios, orientas presupuestos y ayudas a agendar o dejar contacto. Responde en español, en tono cercano, claro y breve (2-4 frases). Para precios exactos, pide detalles del proyecto (alcance, plazos) y ofrece coordinar una reunión o usar la sección Contacto. No inventes datos, clientes ni cifras que no conozcas.';
+    window.claude.complete({ system: system, max_tokens: 600, messages: api })
+      .then(reply => this.setState(s => ({ messages: s.messages.concat([{ role: 'assistant', content: String(reply || '').trim() || '¿Podrías darme un poco más de detalle?' }]), chatLoading: false }), this.scrollChat))
+      .catch(() => this.setState(s => ({ messages: s.messages.concat([{ role: 'assistant', content: 'Uy, tuve un problema para responder. Escríbenos por la sección Contacto y te contactamos pronto.' }]), chatLoading: false }), this.scrollChat));
+  };
+  renderVals() {
+    const s = this.state;
+    const vals = {};
+    for (let i = 0; i < 6; i++) vals['a' + i] = (i === s.sec);
+    vals.fAll = s.filter === 'all';
+    vals.fBranding = s.filter === 'branding';
+    vals.fWeb = s.filter === 'web';
+    vals.fAudio = s.filter === 'audio';
+    vals.visibleCases = this.cases
+      .map((c, idx) => ({ c, idx }))
+      .filter(({ c }) => s.filter === 'all' || c.cats.indexOf(s.filter) !== -1)
+      .map(({ c, idx }) => ({ title: c.title, tags: c.tags, open: () => this.openCase(idx) }));
+    const cs = this.cases[s.caseIdx];
+    const dur = s.audioDur || 0, curT = s.audioCur || 0;
+    vals.caseTitle = cs.title; vals.caseTags = cs.tags; vals.caseDesc = cs.desc; vals.caseUrl = cs.url;
+    vals.caseBgId = 'case-bg-' + s.caseIdx; vals.caseBoxId = 'case-box-' + s.caseIdx;
+    vals.hasAudio = !!cs.audio;
+    vals.playing = s.playing; vals.notPlaying = !s.playing;
+    vals.audioPct = (dur ? (curT / dur) * 100 : 0) + '%';
+    vals.audioCurLabel = this.fmt(curT);
+    vals.audioDurLabel = this.fmt(dur);
+    vals.caseOpen = s.caseOpen;
+    vals.sent = s.sent;
+    vals.waLink = 'https://wa.me/' + String(this.props.whatsapp ?? '56920191624').replace(/[^0-9]/g, '');
+    const secAccents = ['#899EAA', '#B7D0DE', '#C9DCE6', '#E7CBAD', '#C6D2DB', '#899EAA'];
+    let acc = secAccents[s.sec] || '#899EAA';
+    if (s.caseOpen) acc = '#C9D6DE';
+    vals.botColor = acc;
+    vals.chatOpen = s.chatOpen;
+    vals.chatLoading = s.chatLoading;
+    vals.chatMsgs = s.messages.map(m => ({
+      text: m.content,
+      align: m.role === 'user' ? 'flex-end' : 'flex-start',
+      bg: m.role === 'user' ? acc : 'rgba(255,255,255,0.07)',
+      color: m.role === 'user' ? '#16191c' : '#DDE6EA'
+    }));
+    return Object.assign(vals, {
+      enter: () => this.goTo(1),
+      toggleChat: this.toggleChat,
+      closeChat: this.closeChat,
+      sendChat: this.sendChat,
+      chatKey: this.chatKey,
+      setChatInput: this.setChatInput,
+      setChatScroll: this.setChatScroll,
+      goHome: () => { this.setState({ caseOpen: false }); this.goTo(1); },
+      goTrabajos: () => this.goTo(2),
+      goQue: () => this.goTo(3),
+      goSobre: () => this.goTo(4),
+      goContacto: () => this.goTo(5),
+      setAll: () => this.setState({ filter: 'all' }),
+      setBranding: () => this.setState({ filter: 'branding' }),
+      setWeb: () => this.setState({ filter: 'web' }),
+      setAudio: () => this.setState({ filter: 'audio' }),
+      closeCase: () => { this.stopAudio(); this.setState({ caseOpen: false }); },
+      caseHome: () => { this.stopAudio(); this.setState({ caseOpen: false }); this.goTo(1); },
+      prevCase: () => { this.stopAudio(); this.setState({ caseIdx: (s.caseIdx + this.cases.length - 1) % this.cases.length }); },
+      nextCase: () => { this.stopAudio(); this.setState({ caseIdx: (s.caseIdx + 1) % this.cases.length }); },
+      send: (e) => {
+        const btn = e.currentTarget;
+        btn.style.animation = 'bmBtnPulse 500ms ease-in-out';
+        setTimeout(() => { btn.style.animation = ''; }, 500);
+        this.setState({ sent: true });
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>

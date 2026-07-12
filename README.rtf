@@ -1,0 +1,197 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww18320\viewh17420\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs36 \cf0 # Breadman.studio\
+\
+Sitio construido con Next.js 14 (App Router) + Tailwind + Sanity CMS.\
+Estructura: Home \'97 Portafolio \'97 Servicios \'97 Sobre \'97 Contacto, seg\'fan el\
+wireframe y sistema de marca ya definidos (crema/corteza, isotipo,\
+pulso, navegaci\'f3n en capas).\
+\
+## 1. Instalar dependencias\
+\
+```bash\
+npm install\
+```\
+\
+## 2. Crear el proyecto en Sanity (lo haces t\'fa, requiere tu login)\
+\
+1. Ve a https://sanity.io/manage y entra con tu cuenta.\
+2. Crea un proyecto nuevo, o usa uno existente si ya tienes uno para\
+   Breadman.\
+3. Copia el **Project ID** que te muestra.\
+4. En el dataset, deja `production` (viene por defecto).\
+\
+## 3. Conectar las variables de entorno\
+\
+```bash\
+cp .env.local.example .env.local\
+```\
+\
+Abre `.env.local` y pega tu Project ID real:\
+\
+```\
+NEXT_PUBLIC_SANITY_PROJECT_ID=el_id_que_copiaste\
+NEXT_PUBLIC_SANITY_DATASET=production\
+```\
+\
+## 4. Probar en local\
+\
+```bash\
+npm run dev\
+```\
+\
+- Sitio: http://localhost:3000\
+- Panel de edici\'f3n de contenido (Sanity Studio, embebido):\
+  http://localhost:3000/studio\
+\
+Entra a `/studio`, inicia sesi\'f3n con tu cuenta de Sanity, y ah\'ed puedes\
+crear tus primeros "Casos de portafolio" (Austral, NIUKID, RQ Medical,\
+Campo Capital) con sus tags de Branding / Web / Audio, tal como qued\'f3\
+definido.\
+\
+## 5. Subir a GitHub\
+\
+```bash\
+git init\
+git add .\
+git commit -m "Primer commit: estructura base de Breadman.studio"\
+git branch -M main\
+git remote add origin <URL_DE_TU_REPO_VACIO>\
+git push -u origin main\
+```\
+\
+(Crea el repo vac\'edo en GitHub primero, sin README, y pega la URL que te\
+dan ah\'ed)\
+\
+## 6. Deploy en Vercel (lo haces t\'fa, requiere tu login)\
+\
+1. Ve a https://vercel.com/new\
+2. Importa el repositorio que acabas de subir a GitHub.\
+3. En "Environment Variables", agrega las mismas dos variables de tu\
+   `.env.local`:\
+   - `NEXT_PUBLIC_SANITY_PROJECT_ID`\
+   - `NEXT_PUBLIC_SANITY_DATASET`\
+4. Deploy.\
+\
+Con eso el sitio queda publicado, y `/studio` funciona tambi\'e9n en\
+producci\'f3n para que sigas cargando y editando el portafolio sin volver\
+a tocar c\'f3digo.\
+\
+# Breadman.studio\
+\
+Sitio construido con Next.js 14 (App Router) + Tailwind + Sanity CMS.\
+\
+## \uc0\u9888 \u65039  Estado actual (importante, leer antes de seguir)\
+\
+El dise\'f1o cambi\'f3 de direcci\'f3n respecto a la primera exploraci\'f3n con Fable\
+(paleta crema/corteza). La direcci\'f3n **definitiva** ahora es la que viene\
+en `design-reference/README.md` \'97 paleta multicolor por secci\'f3n, tipograf\'eda\
+JetBrains Mono, navegaci\'f3n single-page con crossfade (desktop) / hojas\
+deslizables (mobile), overlay de detalle de caso, reproductor de audio, y\
+un asistente de chat con IA integrado.\
+\
+Ya est\'e1 actualizado en este repo:\
+- `tailwind.config.ts` \'97 colores y animaciones nuevas\
+- `app/layout.tsx` \'97 fuente JetBrains Mono\
+- `public/assets/` \'97 logo.svg, sobre-fondo.png, sobre-silueta.png reales\
+\
+**Pendiente (requiere reconstrucci\'f3n con Claude Code, ver m\'e1s abajo):**\
+Las p\'e1ginas actuales (`app/page.tsx`, `app/portafolio/`, etc.) y los\
+componentes (`Nav.tsx`, `Pulse.tsx`, `CaseCard.tsx`) todav\'eda usan las\
+clases de color viejas (`bg-cream`, `text-crust`) que ya no existen en el\
+Tailwind config \'97 van a romper hasta que Claude Code las reconstruya\
+siguiendo `design-reference/README.md`, que es la fuente de verdad para\
+toda la interacci\'f3n (timings de animaci\'f3n exactos, estructura de\
+secciones, comportamiento del chat, reproductor de audio, etc.)\
+\
+## 1. Instalar dependencias\
+\
+```bash\
+npm install\
+```\
+\
+## 2. Reconstruir el dise\'f1o con Claude Code\
+\
+Abre este proyecto en Claude Code y p\'e9gale esto:\
+\
+```\
+Este proyecto Next.js + Tailwind + Sanity necesita reconstruir su UI\
+siguiendo design-reference/README.md al pie de la letra (colores,\
+tipograf\'eda, espaciados, animaciones y comportamiento est\'e1n definidos ah\'ed\
+con valores exactos). Los archivos .dc.html en design-reference/design_files/\
+son solo referencia visual, NO los copies literalmente \'97 recr\'e9alos como\
+componentes React idiom\'e1ticos de este proyecto.\
+\
+Mant\'e9n la conexi\'f3n a Sanity intacta: los casos de portafolio siguen\
+viniendo de lib/queries.ts y sanity/schemaTypes/caseStudy.ts, no los\
+hardcodees. Actualiza el schema de Sanity si el nuevo dise\'f1o necesita\
+campos que hoy no existen (ej. "tipo de proyecto" en el formulario de\
+contacto).\
+\
+El asistente de chat necesita un endpoint real (no window.claude.complete,\
+eso era del entorno de prototipo) \'97 usa la API de Anthropic desde una\
+route handler de Next.js (app/api/chat/route.ts), con el system prompt\
+que ya est\'e1 documentado en design-reference/README.md.\
+```\
+\
+## 3. Crear el proyecto en Sanity (lo haces t\'fa, requiere tu login)\
+\
+1. Ve a https://sanity.io/manage y entra con tu cuenta.\
+2. Crea un proyecto nuevo, o usa uno existente si ya tienes uno para\
+   Breadman.\
+3. Copia el **Project ID** que te muestra.\
+4. En el dataset, deja `production` (viene por defecto).\
+\
+## 4. Conectar las variables de entorno\
+\
+```bash\
+cp .env.local.example .env.local\
+```\
+\
+Abre `.env.local` y pega tu Project ID real:\
+\
+```\
+NEXT_PUBLIC_SANITY_PROJECT_ID=el_id_que_copiaste\
+NEXT_PUBLIC_SANITY_DATASET=production\
+```\
+\
+Si implementas el chat con la API de Anthropic, agrega tambi\'e9n:\
+\
+```\
+ANTHROPIC_API_KEY=tu_api_key\
+```\
+\
+## 5. Probar en local\
+\
+```bash\
+npm run dev\
+```\
+\
+- Sitio: http://localhost:3000\
+- Panel de edici\'f3n (Sanity Studio): http://localhost:3000/studio\
+\
+## 6. Subir a GitHub\
+\
+```bash\
+git init\
+git add .\
+git commit -m "Primer commit: estructura base + handoff de dise\'f1o"\
+git branch -M main\
+git remote add origin <URL_DE_TU_REPO_VACIO>\
+git push -u origin main\
+```\
+\
+## 7. Deploy en Vercel (lo haces t\'fa, requiere tu login)\
+\
+1. Ve a https://vercel.com/new\
+2. Importa el repositorio.\
+3. Agrega las variables de entorno (las mismas de tu `.env.local`,\
+   incluida `ANTHROPIC_API_KEY` si aplica).\
+4. Deploy.\
+\
+}
