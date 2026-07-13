@@ -11,47 +11,16 @@ export async function getCaseStudies() {
       coverImage,
       backgroundDesktop,
       backgroundMobile,
+      "backgroundVideoDesktopUrl": backgroundVideoDesktop.asset->url,
+      "backgroundVideoMobileUrl": backgroundVideoMobile.asset->url,
       "audioFileUrl": audioFile.asset->url,
       audioEmbedUrl,
+      "videoFileUrl": videoFile.asset->url,
+      videoUrl,
       externalUrl,
       featured
     }
   `);
-}
-
-export async function getFeaturedCase() {
-  return client.fetch(`
-    *[_type == "caseStudy" && featured == true][0] {
-      _id,
-      title,
-      slug,
-      tags,
-      summary,
-      coverImage,
-      externalUrl
-    }
-  `);
-}
-
-export async function getCaseBySlug(slug: string) {
-  return client.fetch(
-    `
-    *[_type == "caseStudy" && slug.current == $slug][0] {
-      _id,
-      title,
-      tags,
-      body,
-      coverImage,
-      gallery,
-      "videoFileUrl": videoFile.asset->url,
-      videoUrl,
-      "audioFileUrl": audioFile.asset->url,
-      audioEmbedUrl,
-      externalUrl
-    }
-  `,
-    { slug }
-  );
 }
 
 export async function getSiteSettings() {

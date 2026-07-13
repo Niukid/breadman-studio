@@ -3,9 +3,12 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import BmLogo from "./BmLogo";
 import BmMark from "./BmMark";
-import useAudioPlayer from "./useAudioPlayer";
 import useChat from "./useChat";
 import { ChatFab, ChatPanel } from "./Chat";
+import CaseAudio from "./CaseAudio";
+import CaseVideo from "./CaseVideo";
+import CaseLinkButton from "./CaseLinkButton";
+import SocialLinks from "./SocialLinks";
 import type { SiteCase } from "./caseData";
 
 const STRIPE_H = 9;
@@ -150,6 +153,9 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
     if (menu || caseOpen || chat.open) return;
     if (Date.now() < lockUntil.current) return;
     if (mag < 40) return;
+    const min = visited ? 1 : 0;
+    if (dir > 0 && cur >= 5) return;
+    if (dir < 0 && cur <= min) return;
     const sc = scroller();
     if (dir > 0) {
       if (sc && sc.scrollHeight - sc.scrollTop - sc.clientHeight > 4) return;
@@ -161,10 +167,24 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
   };
 
   useEffect(() => {
+    const min = visited ? 1 : 0;
     const onWheel = (e: WheelEvent) => gesture(e.deltaY > 0 ? 1 : -1, Math.abs(e.deltaY));
     const onTS = (e: TouchEvent) => {
       touchY.current = e.touches[0].clientY;
       touchT.current = Date.now();
+    };
+    const onTM = (e: TouchEvent) => {
+      if (touchY.current == null || menu || caseOpen || chat.open) return;
+      const dy = touchY.current - e.touches[0].clientY;
+      const sc = scroller();
+      // At a section boundary (nothing left to scroll in that direction),
+      // block the browser's native overscroll/pull-to-refresh gesture so it
+      // can't hijack the swipe and reset the page.
+      const atBottom = !sc || sc.scrollHeight - sc.scrollTop - sc.clientHeight <= 4;
+      const atTop = !sc || sc.scrollTop <= 4;
+      if ((dy > 0 && cur >= 5 && atBottom) || (dy < 0 && cur <= min && atTop)) {
+        e.preventDefault();
+      }
     };
     const onTE = (e: TouchEvent) => {
       if (touchY.current == null) return;
@@ -175,10 +195,12 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
     };
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("touchstart", onTS, { passive: true });
+    window.addEventListener("touchmove", onTM, { passive: false });
     window.addEventListener("touchend", onTE, { passive: true });
     return () => {
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTS);
+      window.removeEventListener("touchmove", onTM);
       window.removeEventListener("touchend", onTE);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,15 +215,12 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
   };
 
   const cs = cases[caseIdx];
-  const audio = useAudioPlayer(cs?.audioUrl || "");
 
   const openCase = (idx: number) => {
-    audio.stop();
     setCaseOpen(true);
     setCaseIdx(idx);
   };
   const closeCase = () => {
-    audio.stop();
     setCaseOpen(false);
   };
 
@@ -308,7 +327,7 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
             Casos de diseño, branding, web y motion. Sectores: arquitectura, salud, finanzas, música y cultura.
           </Reveal>
           <Reveal i={2} className="flex gap-2.5 flex-wrap mb-11">
-            {["Todo", "Branding", "Web", "Audio"].map((f) => (
+            {["Todo", "Branding", "Web", "Audio", "Motion"].map((f) => (
               <span key={f} className="rounded-[10px] text-[11px]" style={{ border: "1px solid #B7D0DE", color: "#B7D0DE", padding: "5px 12px" }}>
                 {f}
               </span>
@@ -375,7 +394,7 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
 
       {/* 5 · CONTACTO */}
       <Sheet i={5} shown={cur >= 5} active={cur === 5} bg={SECTION_BG[5]} zIndex={15} scrollerRef={(el) => (scrollers.current[5] = el)}>
-        <div className="box-border px-6 pt-6 pb-12">
+        <div className="box-border px-6 pt-6 min-h-full flex flex-col" style={{ paddingBottom: 100 }}>
           <Header accent="#899EAA" onHome={() => goTo(1)} onMenu={() => setMenu(true)} />
           <Reveal i={0} className="italic font-extralight" style={{ color: "#899EAA", fontSize: 40, letterSpacing: ".02em" }}>
             CONTACTO
@@ -406,12 +425,13 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
           <Reveal i={3} style={{ color: "#899EAA", fontSize: 13, margin: "22px 0 28px" }}>
             Email directo · Instagram · Facebook
           </Reveal>
-          <Reveal i={4} className="flex flex-col items-center gap-2.5">
+          <Reveal i={4} className="flex flex-col items-center gap-2.5 mt-auto pt-8">
             <BmLogo color="#899EAA" width={105} />
             <div className="text-center" style={{ color: "#899EAA", fontSize: 11, lineHeight: 1.7 }}>
               Hecho con método y tiempo
               <br />© 2026 Breadman.Studio
             </div>
+            <SocialLinks color="#899EAA" />
           </Reveal>
         </div>
       </Sheet>
@@ -435,20 +455,13 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
         <MobileCaseOverlay
           open={caseOpen}
           c={cs}
-          audio={audio}
           onHome={() => {
             closeCase();
             goTo(1);
           }}
           onClose={closeCase}
-          onPrev={() => {
-            audio.stop();
-            setCaseIdx((i) => (i + cases.length - 1) % cases.length);
-          }}
-          onNext={() => {
-            audio.stop();
-            setCaseIdx((i) => (i + 1) % cases.length);
-          }}
+          onPrev={() => setCaseIdx((i) => (i + cases.length - 1) % cases.length)}
+          onNext={() => setCaseIdx((i) => (i + 1) % cases.length)}
         />
       )}
 
@@ -508,7 +521,7 @@ function MobileCaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
       onClick={onOpen}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
-      className="rounded-2xl flex flex-col justify-end p-6 cursor-pointer"
+      className="rounded-[10px] flex flex-col justify-end p-6 cursor-pointer"
       style={{
         backgroundColor: "#263038",
         aspectRatio: "1.3",
@@ -522,7 +535,7 @@ function MobileCaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
       <div className="font-bold text-[22px]" style={{ color: "#B7D0DE" }}>
         {c.title}
       </div>
-      <div className="mt-2" style={{ color: "rgba(183,208,222,.6)", fontSize: 14 }}>
+      <div className="mt-1" style={{ color: "#B7D0DE", fontSize: 14 }}>
         {c.tagsLabel}
       </div>
     </div>
@@ -532,7 +545,6 @@ function MobileCaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
 function MobileCaseOverlay({
   open,
   c,
-  audio,
   onHome,
   onClose,
   onPrev,
@@ -540,26 +552,80 @@ function MobileCaseOverlay({
 }: {
   open: boolean;
   c: SiteCase;
-  audio: ReturnType<typeof useAudioPlayer>;
   onHome: () => void;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
 }) {
-  if (!c) return null;
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [displayCase, setDisplayCase] = useState(c);
+  const [fade, setFade] = useState(true);
+  const swipeX = useRef<number | null>(null);
+  const swipeY = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!c) return;
+    if (!displayCase || c.id === displayCase.id) {
+      setDisplayCase(c);
+      return;
+    }
+    setFade(false);
+    const t = setTimeout(() => {
+      setDisplayCase(c);
+      setFade(true);
+    }, 220);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c]);
+
+  if (!c || !displayCase) return null;
+  const d = displayCase;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    swipeX.current = e.touches[0].clientX;
+    swipeY.current = e.touches[0].clientY;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (swipeX.current == null || swipeY.current == null) return;
+    const dx = e.changedTouches[0].clientX - swipeX.current;
+    const dy = e.changedTouches[0].clientY - swipeY.current;
+    swipeX.current = null;
+    swipeY.current = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      if (dx < 0) onNext();
+      else onPrev();
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-[300] bg-[#101010]"
-      style={{ transform: open ? "translateX(0)" : "translateX(-100%)", transition: "transform 500ms cubic-bezier(.65,0,.35,1)" }}
+      style={{ transform: open ? "translateX(0)" : "translateX(100%)", transition: "transform 500ms cubic-bezier(.65,0,.35,1)" }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
-      {c.bgImageMobileUrl && (
-        <img
-          src={c.bgImageMobileUrl}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: "brightness(.8)" }}
-        />
-      )}
+      <div style={{ opacity: fade ? 1 : 0, transition: "opacity 220ms ease" }}>
+        {d.bgVideoMobileUrl ? (
+          <video
+            src={d.bgVideoMobileUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: "brightness(.8)" }}
+          />
+        ) : (
+          d.bgImageMobileUrl && (
+            <img
+              src={d.bgImageMobileUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ filter: "brightness(.8)" }}
+            />
+          )
+        )}
+      </div>
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -583,77 +649,64 @@ function MobileCaseOverlay({
           </button>
         </div>
         <div className="flex-1" style={{ minHeight: 24 }} />
-        <h1 className="italic font-extralight text-left" style={{ color: "#899EAA", fontSize: 40, lineHeight: 1.1, margin: "0 0 26px" }}>
-          {c.title}
-        </h1>
-        <div className="mb-[22px]" style={{ color: "#899EAA", fontSize: 13 }}>
-          {c.tagsLabel}
-        </div>
-        <div className="mb-6" style={{ color: "#899EAA", fontSize: 13, lineHeight: 1.55 }}>
-          {c.desc}
-        </div>
-        <div className="font-bold mb-3" style={{ color: "#B7D0DE", fontSize: 18 }}>
-          Qué se hizo
-        </div>
-        <div className="mb-[30px]" style={{ color: "#899EAA", fontSize: 13 }}>
-          {c.made}
-        </div>
-        {c.audioUrl && (
-          <div className="rounded-xl mb-[30px]" style={{ border: "1px solid #5F7884", padding: "12px 14px" }}>
-            <div className="mb-[11px] text-[10px]" style={{ color: "#5F7884", letterSpacing: ".14em" }}>
-              DISEÑO SONORO
-            </div>
-            <div className="flex items-center gap-3.5">
-              <button
-                onClick={audio.togglePlay}
-                aria-label="Reproducir"
-                className="flex-none w-10 h-10 rounded-full flex items-center justify-center cursor-pointer"
-                style={{ border: "1px solid #899EAA", background: "none" }}
-              >
-                {audio.playing ? (
-                  <svg viewBox="0 0 24 24" className="w-[15px]" fill="#899EAA">
-                    <rect x={6} y={5} width={4} height={14} />
-                    <rect x={14} y={5} width={4} height={14} />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24" className="w-[15px] ml-0.5" fill="#899EAA">
-                    <path d="M7 4v16l13-8z" />
-                  </svg>
-                )}
-              </button>
-              <div className="flex-1 min-w-0">
-                <div onClick={audio.seek} className="h-1.5 rounded-full cursor-pointer overflow-hidden" style={{ background: "rgba(137,158,170,0.22)" }}>
-                  <div className="h-full" style={{ width: `${audio.pct}%`, background: "#899EAA" }} />
-                </div>
-                <div className="flex justify-between mt-[7px] text-[11px]" style={{ color: "#5F7884" }}>
-                  <span>{audio.curLabel}</span>
-                  <span>{audio.durLabel}</span>
-                </div>
-              </div>
-            </div>
-            <audio ref={audio.audioRef} preload="metadata" className="hidden" />
+        <div style={{ opacity: fade ? 1 : 0, transition: "opacity 220ms ease" }}>
+          <h1 className="italic font-extralight text-left" style={{ color: "#B7D0DE", fontSize: 40, lineHeight: 1.1, margin: "0 0 14px" }}>
+            {d.title}
+          </h1>
+          <div className="mt-2 mb-4" style={{ color: "#899EAA", fontSize: 13 }}>
+            {d.tagsLabel}
           </div>
-        )}
-        {c.url && (
-          <a
-            href={c.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="self-start rounded-[9px] font-bold"
-            style={{ background: "none", border: "1px solid #5F7884", padding: "10px 22px", fontSize: 11, color: "#899EAA" }}
-          >
-            Visitar Sitio
-          </a>
-        )}
+          <div className="mb-5" style={{ color: "#B7D0DE", fontSize: 13, lineHeight: 1.55 }}>
+            {d.desc}
+          </div>
+          {(d.audioFileUrl || d.audioEmbedUrl) && (
+            <div className="mb-5">
+              <div className="mb-1.5 text-[10px]" style={{ color: "#B7D0DE", letterSpacing: ".14em" }}>
+                DISEÑO SONORO
+              </div>
+              <CaseAudio audioFileUrl={d.audioFileUrl} audioEmbedUrl={d.audioEmbedUrl} accent="#899EAA" variant="mobile" />
+            </div>
+          )}
+          {((d.videoFileUrl || d.videoUrl) || d.url) && (
+            <div className="flex items-center flex-wrap gap-3">
+              {(d.videoFileUrl || d.videoUrl) && (
+                <CaseLinkButton onClick={() => setVideoOpen(true)} variant="mobile">
+                  Ver video ▶
+                </CaseLinkButton>
+              )}
+              {d.url && (
+                <CaseLinkButton href={d.url} variant="mobile">
+                  Visitar Sitio
+                </CaseLinkButton>
+              )}
+            </div>
+          )}
+        </div>
         <div className="flex justify-between mt-11">
-          <button onClick={onPrev} className="bg-transparent border-none font-bold text-[13px] cursor-pointer p-0" style={{ color: "#899EAA" }}>
+          <button onClick={onPrev} className="bg-transparent border-none font-bold text-[13px] cursor-pointer p-0" style={{ color: "#B7D0DE" }}>
             ← Anterior
           </button>
-          <button onClick={onNext} className="bg-transparent border-none font-bold text-[13px] cursor-pointer p-0" style={{ color: "#899EAA" }}>
+          <button onClick={onNext} className="bg-transparent border-none font-bold text-[13px] cursor-pointer p-0" style={{ color: "#B7D0DE" }}>
             Siguiente →
           </button>
         </div>
       </div>
+      {videoOpen && (d.videoFileUrl || d.videoUrl) && (
+        <div className="fixed inset-0 z-[310] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.9)" }}>
+          <button
+            onClick={() => setVideoOpen(false)}
+            aria-label="Cerrar video"
+            className="absolute top-5 right-5 bg-transparent border-none p-1.5 cursor-pointer"
+          >
+            <svg viewBox="0 0 24 24" className="w-[30px]" stroke="#899EAA" strokeWidth={1} fill="none">
+              <path d="M4 4l16 16M20 4L4 20" />
+            </svg>
+          </button>
+          <div className="w-full">
+            <CaseVideo videoFileUrl={d.videoFileUrl} videoUrl={d.videoUrl} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import BmLogo from "./BmLogo";
 import useHover from "./useHover";
-import useAudioPlayer from "./useAudioPlayer";
 import useChat from "./useChat";
 import { ChatFab, ChatPanel } from "./Chat";
+import CaseAudio from "./CaseAudio";
+import CaseVideo from "./CaseVideo";
+import CaseLinkButton from "./CaseLinkButton";
+import SocialLinks from "./SocialLinks";
 import type { SiteCase } from "./caseData";
 
 const NAV_LINKS = [
@@ -125,7 +128,7 @@ const SERVICES = [
 export default function Desktop({ cases }: { cases: SiteCase[] }) {
   const [sec, setSec] = useState(0);
   const [visited, setVisited] = useState(false);
-  const [filter, setFilter] = useState<"all" | "branding" | "web" | "audio">("all");
+  const [filter, setFilter] = useState<"all" | "branding" | "web" | "audio" | "motion">("all");
   const [caseOpen, setCaseOpen] = useState(false);
   const [caseIdx, setCaseIdx] = useState(0);
   const [sent, setSent] = useState(false);
@@ -154,15 +157,12 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
   };
 
   const cs = cases[caseIdx];
-  const audio = useAudioPlayer(cs?.audioUrl || "");
 
   const openCase = (idx: number) => {
-    audio.stop();
     setCaseOpen(true);
     setCaseIdx(idx);
   };
   const closeCase = () => {
-    audio.stop();
     setCaseOpen(false);
   };
 
@@ -232,12 +232,12 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
               <br />
               WEB—SONIDO
             </h1>
-            <p className="mt-8 max-w-[520px]" style={{ color: "rgba(183,208,222,.85)", fontSize: 17, lineHeight: 1.6 }}>
+            <p className="mt-8 max-w-[520px]" style={{ color: SECTION_ACCENT[1], fontSize: 17, lineHeight: 1.6 }}>
               Marcas que funcionan en imagen,
               <br />
               movimiento y sonido.
             </p>
-            <PillButton onClick={() => goTo(2)} accent="#899EAA" bg="#283035" className="mt-8 self-start text-base" style={{ padding: "16px 48px" }}>
+            <PillButton onClick={() => goTo(2)} accent={SECTION_ACCENT[1]} bg="#283035" className="mt-8 self-start text-base" style={{ padding: "16px 48px" }}>
               Ver Trabajos
             </PillButton>
           </div>
@@ -261,9 +261,9 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
               Casos de diseño, branding, web y motion. Sectores: arquitectura, salud, finanzas, música y cultura.
             </p>
             <div className="flex gap-3.5 flex-wrap my-5">
-              {(["all", "branding", "web", "audio"] as const).map((f) => (
+              {(["all", "branding", "web", "audio", "motion"] as const).map((f) => (
                 <FilterPill key={f} active={filter === f} onClick={() => setFilter(f)}>
-                  {f === "all" ? "Todo" : f === "branding" ? "Branding" : f === "web" ? "Web" : "Audio"}
+                  {f === "all" ? "Todo" : f === "branding" ? "Branding" : f === "web" ? "Web" : f === "audio" ? "Audio" : "Motion"}
                 </FilterPill>
               ))}
             </div>
@@ -392,10 +392,11 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
             </form>
           </div>
           <footer
-            className="text-center flex-none"
+            className="flex-none flex items-center justify-start gap-5"
             style={{ padding: "34px max(56px, calc((100% - 1440px) / 2)) 26px", color: "rgba(183,208,222,.5)", fontSize: 14 }}
           >
-            Hecho con método y tiempo © 2026 Breadman.Studio
+            <span>Hecho con método y tiempo © 2026 Breadman.Studio</span>
+            <SocialLinks color="rgba(183,208,222,.5)" />
           </footer>
         </div>
       </Section>
@@ -405,30 +406,30 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
         <CaseOverlay
           open={caseOpen}
           c={cs}
-          audio={audio}
           onHome={() => {
             closeCase();
             goTo(1);
           }}
           onClose={closeCase}
-          onPrev={() => {
-            audio.stop();
-            setCaseIdx((i) => (i + cases.length - 1) % cases.length);
-          }}
-          onNext={() => {
-            audio.stop();
-            setCaseIdx((i) => (i + 1) % cases.length);
-          }}
+          onPrev={() => setCaseIdx((i) => (i + cases.length - 1) % cases.length)}
+          onNext={() => setCaseIdx((i) => (i + 1) % cases.length)}
         />
       )}
 
       {/* ASISTENTE / CHAT */}
-      <div className="absolute z-[72]" style={{ right: 34, bottom: 34 }}>
+      <div className="absolute z-[72]" style={{ right: 34, bottom: caseOpen ? 90 : 34 }}>
         <ChatFab accent={accent} onClick={chat.toggle} className="w-[60px] h-[60px]" />
       </div>
       <div
         className="absolute z-[72] pointer-events-none"
-        style={{ right: 34, bottom: 108, width: 360, maxWidth: "calc(100% - 48px)", height: 470, maxHeight: "calc(100% - 150px)" }}
+        style={{
+          right: 34,
+          bottom: caseOpen ? 164 : 108,
+          width: 360,
+          maxWidth: "calc(100% - 48px)",
+          height: 470,
+          maxHeight: caseOpen ? "calc(100% - 210px)" : "calc(100% - 150px)",
+        }}
       >
         <ChatPanel chat={chat} accent={accent} className="w-full h-full" />
       </div>
@@ -483,7 +484,7 @@ function FilterPill({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className="bg-transparent cursor-pointer rounded-[10px] font-mono text-[13px]"
+      className="bg-transparent cursor-pointer rounded-[12px] font-mono text-[13px]"
       style={{
         color: "#C9DCE6",
         border: `1px solid rgba(201,220,230,${active ? 1 : 0.55})`,
@@ -502,7 +503,7 @@ function CaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
     <div
       onClick={onOpen}
       {...handlers}
-      className="rounded-2xl flex flex-col justify-end p-6 cursor-pointer"
+      className="rounded-[12px] flex flex-col justify-end p-6 cursor-pointer"
       style={{
         backgroundColor: hovered ? "#2C3841" : "#263038",
         aspectRatio: "1.85",
@@ -516,7 +517,7 @@ function CaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
       <div className="font-bold text-[22px]" style={{ color: "#B7D0DE" }}>
         {c.title}
       </div>
-      <div className="mt-[9px] text-sm" style={{ color: "rgba(183,208,222,.6)" }}>
+      <div className="mt-1 text-sm" style={{ color: "#B7D0DE" }}>
         {c.tagsLabel}
       </div>
     </div>
@@ -526,7 +527,6 @@ function CaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
 function CaseOverlay({
   open,
   c,
-  audio,
   onHome,
   onClose,
   onPrev,
@@ -534,26 +534,59 @@ function CaseOverlay({
 }: {
   open: boolean;
   c: SiteCase;
-  audio: ReturnType<typeof useAudioPlayer>;
   onHome: () => void;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
 }) {
-  if (!c) return null;
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [displayCase, setDisplayCase] = useState(c);
+  const [fade, setFade] = useState(true);
+
+  useEffect(() => {
+    if (!c) return;
+    if (!displayCase || c.id === displayCase.id) {
+      setDisplayCase(c);
+      return;
+    }
+    setFade(false);
+    const t = setTimeout(() => {
+      setDisplayCase(c);
+      setFade(true);
+    }, 220);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c]);
+
+  if (!c || !displayCase) return null;
+  const d = displayCase;
   return (
     <div
       className="absolute inset-0 z-[60] bg-[#101010]"
       style={{ opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity 500ms ease" }}
     >
-      {c.bgImageDesktopUrl && (
-        <img
-          src={c.bgImageDesktopUrl}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ filter: "brightness(.8)" }}
-        />
-      )}
+      <div style={{ opacity: fade ? 1 : 0, transition: "opacity 220ms ease" }}>
+        {d.bgVideoDesktopUrl ? (
+          <video
+            src={d.bgVideoDesktopUrl}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: "brightness(.8)" }}
+          />
+        ) : (
+          d.bgImageDesktopUrl && (
+            <img
+              src={d.bgImageDesktopUrl}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{ filter: "brightness(.8)" }}
+            />
+          )
+        )}
+      </div>
       <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(16,16,16,.6)" }} />
       <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(0,0,0,.2)" }} />
       <div
@@ -570,106 +603,65 @@ function CaseOverlay({
             </svg>
           </button>
         </div>
-        <div className="flex-1 min-h-0 flex flex-col justify-end">
+        <div className="flex-1 min-h-0 flex flex-col justify-end" style={{ opacity: fade ? 1 : 0, transition: "opacity 220ms ease" }}>
           <div className="relative" style={{ maxWidth: 920 }}>
-            <h1 className="italic font-extralight m-0" style={{ color: "#C9D6DE", fontSize: 44, lineHeight: 1.05 }}>
-              {c.title}
+            <h1 className="italic font-extralight m-0" style={{ color: "#B7D0DE", fontSize: 44, lineHeight: 1.05 }}>
+              {d.title}
             </h1>
-            <div className="my-5" style={{ color: "rgba(201,214,222,.6)", fontSize: 15 }}>
-              {c.tagsLabel}
+            <div className="mt-3 mb-5" style={{ color: "#899EAA", fontSize: 15 }}>
+              {d.tagsLabel}
             </div>
-            <div className="mb-[30px]" style={{ color: "rgba(201,214,222,.85)", fontSize: 16, lineHeight: 1.6 }}>
-              {c.desc}
+            <div className="mb-6" style={{ color: "#B7D0DE", fontSize: 16, lineHeight: 1.6 }}>
+              {d.desc}
             </div>
-            {c.audioUrl && (
-              <div className="rounded-[14px] p-5 mb-8" style={{ border: "1px solid rgba(201,214,222,.4)", maxWidth: 520 }}>
-                <div className="mb-[13px] text-[10px]" style={{ color: "rgba(201,214,222,.55)", letterSpacing: ".16em" }}>
+            {(d.audioFileUrl || d.audioEmbedUrl) && (
+              <div className="mb-5" style={{ maxWidth: 480 }}>
+                <div className="mb-1.5 text-[10px]" style={{ color: "#B7D0DE", letterSpacing: ".16em" }}>
                   DISEÑO SONORO
                 </div>
-                <div className="flex items-center gap-4">
-                  <PlayButton audio={audio} accent="#C9D6DE" />
-                  <div className="flex-1 min-w-0">
-                    <div
-                      onClick={audio.seek}
-                      className="h-1.5 rounded-full cursor-pointer overflow-hidden"
-                      style={{ background: "rgba(201,214,222,.22)" }}
-                    >
-                      <div className="h-full" style={{ width: `${audio.pct}%`, background: "#C9D6DE" }} />
-                    </div>
-                    <div className="flex justify-between mt-2 text-[11px]" style={{ color: "rgba(201,214,222,.5)" }}>
-                      <span>{audio.curLabel}</span>
-                      <span>{audio.durLabel}</span>
-                    </div>
-                  </div>
-                </div>
+                <CaseAudio audioFileUrl={d.audioFileUrl} audioEmbedUrl={d.audioEmbedUrl} accent="#C9D6DE" variant="desktop" />
               </div>
             )}
-            <audio ref={audio.audioRef} preload="metadata" className="hidden" />
-            {c.url && <VisitSiteLink href={c.url} accent="#C9D6DE" onDark="#101010" />}
+            {((d.videoFileUrl || d.videoUrl) || d.url) && (
+              <div className="flex items-center flex-wrap gap-4">
+                {(d.videoFileUrl || d.videoUrl) && (
+                  <CaseLinkButton onClick={() => setVideoOpen(true)} variant="desktop">
+                    Ver video ▶
+                  </CaseLinkButton>
+                )}
+                {d.url && (
+                  <CaseLinkButton href={d.url} variant="desktop">
+                    Visitar Sitio ↗
+                  </CaseLinkButton>
+                )}
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex justify-between items-center py-[18px] flex-none" style={{ paddingBottom: 22 }}>
-          <div className="text-[13px]" style={{ color: "rgba(201,214,222,.5)" }}>
-            al scrollear: galería por bloques, tipo lámina · audio del caso
-          </div>
-          <div className="flex gap-10">
+        <div className="flex justify-end items-center py-[18px] flex-none" style={{ paddingBottom: 22 }}>
+          <div className="flex gap-6">
             <NavArrow onClick={onPrev}>← Anterior</NavArrow>
             <NavArrow onClick={onNext}>Siguiente →</NavArrow>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function PlayButton({ audio, accent }: { audio: ReturnType<typeof useAudioPlayer>; accent: string }) {
-  const { hovered, handlers } = useHover();
-  return (
-    <button
-      onClick={audio.togglePlay}
-      {...handlers}
-      aria-label="Reproducir"
-      className="flex-none w-[46px] h-[46px] rounded-full flex items-center justify-center cursor-pointer"
-      style={{
-        border: `1px solid ${accent}`,
-        background: hovered ? "rgba(201,214,222,.12)" : "none",
-        transition: "background 250ms ease",
-      }}
-    >
-      {audio.playing ? (
-        <svg viewBox="0 0 24 24" className="w-4" fill={accent}>
-          <rect x={6} y={5} width={4} height={14} />
-          <rect x={14} y={5} width={4} height={14} />
-        </svg>
-      ) : (
-        <svg viewBox="0 0 24 24" className="w-4 ml-0.5" fill={accent}>
-          <path d="M7 4v16l13-8z" />
-        </svg>
+      {videoOpen && (d.videoFileUrl || d.videoUrl) && (
+        <div className="absolute inset-0 z-[70] flex items-center justify-center p-10" style={{ background: "rgba(0,0,0,.85)" }}>
+          <button
+            onClick={() => setVideoOpen(false)}
+            aria-label="Cerrar video"
+            className="absolute top-7 right-7 bg-transparent border-none p-1.5 cursor-pointer"
+          >
+            <svg viewBox="0 0 24 24" className="w-9" stroke="#C9D6DE" strokeWidth={1} fill="none">
+              <path d="M4 4l16 16M20 4L4 20" />
+            </svg>
+          </button>
+          <div className="w-full" style={{ maxWidth: 960 }}>
+            <CaseVideo videoFileUrl={d.videoFileUrl} videoUrl={d.videoUrl} />
+          </div>
+        </div>
       )}
-    </button>
-  );
-}
-
-function VisitSiteLink({ href, accent, onDark }: { href: string; accent: string; onDark: string }) {
-  const { hovered, handlers } = useHover();
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      {...handlers}
-      className="inline-flex items-center gap-2.5 font-bold rounded-full"
-      style={{
-        fontSize: 13,
-        color: hovered ? onDark : accent,
-        border: `1px solid rgba(201,214,222,.7)`,
-        background: hovered ? accent : "none",
-        padding: "15px 32px",
-        transition: "background 250ms ease, color 250ms ease",
-      }}
-    >
-      Visitar Sitio ↗
-    </a>
+    </div>
   );
 }
 
@@ -679,8 +671,8 @@ function NavArrow({ onClick, children }: { onClick: () => void; children: React.
     <button
       onClick={onClick}
       {...handlers}
-      className="bg-transparent border-none cursor-pointer p-0 font-bold text-sm"
-      style={{ color: "#C9D6DE", opacity: hovered ? 0.65 : 1, transition: "opacity 250ms ease" }}
+      className="bg-transparent border-none cursor-pointer p-0 font-bold text-[11px]"
+      style={{ color: "#B7D0DE", opacity: hovered ? 0.65 : 1, transition: "opacity 250ms ease" }}
     >
       {children}
     </button>

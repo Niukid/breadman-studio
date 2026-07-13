@@ -6,18 +6,23 @@ export type SiteCase = {
   tagsLabel: string;
   cats: string[];
   desc: string;
-  made: string;
   url: string;
-  audioUrl: string;
+  audioFileUrl: string;
+  audioEmbedUrl: string;
+  videoFileUrl: string;
+  videoUrl: string;
   imageUrl: string;
   bgImageDesktopUrl: string;
   bgImageMobileUrl: string;
+  bgVideoDesktopUrl: string;
+  bgVideoMobileUrl: string;
 };
 
 const tagLabels: Record<string, string> = {
   branding: "Branding",
   web: "Web",
   audio: "Audio",
+  motion: "Motion",
 };
 
 export function mapCases(raw: any[]): SiteCase[] {
@@ -29,9 +34,11 @@ export function mapCases(raw: any[]): SiteCase[] {
       tagsLabel: tags.map((t) => tagLabels[t] ?? t).join(" · "),
       cats: tags,
       desc: c.summary || "",
-      made: tags.length ? "— " + tags.map((t) => tagLabels[t] ?? t).join(" · ") : "",
       url: c.externalUrl || "",
-      audioUrl: c.audioFileUrl || c.audioEmbedUrl || "",
+      audioFileUrl: c.audioFileUrl || "",
+      audioEmbedUrl: c.audioEmbedUrl || "",
+      videoFileUrl: c.videoFileUrl || "",
+      videoUrl: c.videoUrl || "",
       imageUrl: c.coverImage ? urlFor(c.coverImage).width(900).height(680).url() : "",
       bgImageDesktopUrl: c.backgroundDesktop
         ? urlFor(c.backgroundDesktop).width(1600).url()
@@ -43,6 +50,8 @@ export function mapCases(raw: any[]): SiteCase[] {
         : c.coverImage
           ? urlFor(c.coverImage).width(900).url()
           : "",
+      bgVideoDesktopUrl: c.backgroundVideoDesktopUrl || "",
+      bgVideoMobileUrl: c.backgroundVideoMobileUrl || "",
     };
   });
 }

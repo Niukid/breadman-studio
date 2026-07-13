@@ -31,6 +31,7 @@ export default defineType({
           { title: "Branding", value: "branding" },
           { title: "Web", value: "web" },
           { title: "Audio", value: "audio" },
+          { title: "Motion", value: "motion" },
         ],
       },
       validation: (Rule) => Rule.required().min(1),
@@ -68,6 +69,20 @@ export default defineType({
       description: "Imagen de fondo de la página de detalle del caso, versión mobile (puede ser un recorte distinto al de desktop)",
       type: "image",
       options: { hotspot: true },
+    }),
+    defineField({
+      name: "backgroundVideoDesktop",
+      title: "Video de fondo — Desktop",
+      description: "Opcional. Si lo cargas, reemplaza la foto de fondo de escritorio y se reproduce en loop, sin sonido.",
+      type: "file",
+      options: { accept: "video/*" },
+    }),
+    defineField({
+      name: "backgroundVideoMobile",
+      title: "Video de fondo — Mobile",
+      description: "Opcional. Si lo cargas, reemplaza la foto de fondo mobile y se reproduce en loop, sin sonido.",
+      type: "file",
+      options: { accept: "video/*" },
     }),
     defineField({
       name: "gallery",
