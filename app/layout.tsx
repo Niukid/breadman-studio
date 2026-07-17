@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -25,6 +26,10 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${jetbrainsMono.variable} font-mono antialiased`} style={{ margin: 0 }}>
         {children}
+        <Script
+          src="//code.tidio.co/wb2r3ql60w1vmk7ghpbeuu8yfpu1b1pu.js"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

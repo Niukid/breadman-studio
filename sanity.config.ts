@@ -8,6 +8,8 @@ import { schemaTypes } from "./sanity/schemaTypes";
 import { structure } from "./sanity/structure";
 
 export default defineConfig({
+  name: "breadman-studio",
+  title: "Breadman Studio",
   basePath: "/studio",
   projectId,
   dataset,

@@ -3,6 +3,10 @@ import config from "../../../sanity.config";
 
 export const dynamic = "force-static";
 
+export const metadata = {
+  title: "Breadman Studio — Panel de edición",
+};
+
 export default function StudioPage() {
   return <NextStudio config={config} />;
 }

@@ -1,5 +1,36 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 import { writeClient } from "@/sanity/writeClient";
+
+async function sendContactEmail({
+  name,
+  email,
+  projectType,
+  message,
+}: {
+  name: string;
+  email: string;
+  projectType: string;
+  message: string;
+}) {
+  const transporter = nodemailer.createTransport({
+    host: "smtp.mail.me.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.ICLOUD_EMAIL,
+      pass: process.env.ICLOUD_APP_PASSWORD,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.ICLOUD_EMAIL,
+    to: process.env.CONTACT_EMAIL_TO,
+    replyTo: email,
+    subject: `Nuevo mensaje de contacto — ${name}`,
+    text: `Nombre: ${name}\nEmail: ${email}\nTipo de proyecto: ${projectType || "—"}\n\nMensaje:\n${message}`,
+  });
+}
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
@@ -28,6 +59,12 @@ export async function POST(req: Request) {
     message,
     createdAt: new Date().toISOString(),
   });
+
+  try {
+    await sendContactEmail({ name, email, projectType, message });
+  } catch (err) {
+    console.error("No se pudo enviar el correo de contacto:", err);
+  }
 
   return NextResponse.json({ ok: true });
 }
