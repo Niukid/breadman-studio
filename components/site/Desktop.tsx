@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import BmLogo from "./BmLogo";
 import useHover from "./useHover";
-import useChat from "./useChat";
-import { ChatFab, ChatPanel } from "./Chat";
 import CaseAudio from "./CaseAudio";
 import CaseVideo from "./CaseVideo";
 import CaseLinkButton from "./CaseLinkButton";
@@ -134,7 +132,6 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [pulse, setPulse] = useState(false);
-  const chat = useChat();
 
   useEffect(() => {
     let v = false;
@@ -169,8 +166,6 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
   const visibleCases = cases
     .map((c, idx) => ({ c, idx }))
     .filter(({ c }) => filter === "all" || c.cats.includes(filter));
-
-  const accent = caseOpen ? "#C9D6DE" : SECTION_ACCENT[sec] || "#899EAA";
 
   const submitContact = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -416,23 +411,6 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
         />
       )}
 
-      {/* ASISTENTE / CHAT */}
-      <div className="absolute z-[72]" style={{ right: 34, bottom: caseOpen ? 90 : 34 }}>
-        <ChatFab accent={accent} onClick={chat.toggle} className="w-[60px] h-[60px]" />
-      </div>
-      <div
-        className="absolute z-[72] pointer-events-none"
-        style={{
-          right: 34,
-          bottom: caseOpen ? 164 : 108,
-          width: 360,
-          maxWidth: "calc(100% - 48px)",
-          height: 470,
-          maxHeight: caseOpen ? "calc(100% - 210px)" : "calc(100% - 150px)",
-        }}
-      >
-        <ChatPanel chat={chat} accent={accent} className="w-full h-full" />
-      </div>
     </div>
   );
 }
@@ -503,6 +481,8 @@ function CaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
     <div
       onClick={onOpen}
       {...handlers}
+      role="img"
+      aria-label={c.imageAlt || c.title}
       className="rounded-[12px] flex flex-col justify-end p-6 cursor-pointer"
       style={{
         backgroundColor: hovered ? "#2C3841" : "#263038",
@@ -580,7 +560,7 @@ function CaseOverlay({
           d.bgImageDesktopUrl && (
             <img
               src={d.bgImageDesktopUrl}
-              alt=""
+              alt={d.bgImageDesktopAlt || d.title}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "brightness(.8)" }}
             />

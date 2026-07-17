@@ -55,6 +55,14 @@ export default defineType({
       description: "La imagen que se ve en la tarjeta escalonada del listado de portafolio",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Texto alternativo",
+          description: "Describe la imagen para SEO y accesibilidad",
+          type: "string",
+        }),
+      ],
     }),
     defineField({
       name: "backgroundDesktop",
@@ -62,6 +70,14 @@ export default defineType({
       description: "Imagen de fondo de la página de detalle del caso, versión escritorio",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Texto alternativo",
+          description: "Describe la imagen para SEO y accesibilidad",
+          type: "string",
+        }),
+      ],
     }),
     defineField({
       name: "backgroundMobile",
@@ -69,6 +85,14 @@ export default defineType({
       description: "Imagen de fondo de la página de detalle del caso, versión mobile (puede ser un recorte distinto al de desktop)",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Texto alternativo",
+          description: "Describe la imagen para SEO y accesibilidad",
+          type: "string",
+        }),
+      ],
     }),
     defineField({
       name: "backgroundVideoDesktop",
@@ -88,7 +112,20 @@ export default defineType({
       name: "gallery",
       title: "Galería de fotos (página de detalle)",
       type: "array",
-      of: [{ type: "image", options: { hotspot: true } }],
+      of: [
+        {
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Texto alternativo",
+              description: "Describe la imagen para SEO y accesibilidad",
+              type: "string",
+            }),
+          ],
+        },
+      ],
     }),
     defineField({
       name: "videoFile",

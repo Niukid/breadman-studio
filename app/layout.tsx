@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "Breadman",
+  url: SITE_URL,
+  areaServed: "Valle del Aconcagua, Chile",
+  address: {
+    "@type": "PostalAddress",
+    addressRegion: "Valparaíso",
+    addressCountry: "CL",
+  },
+  serviceType: ["Diseño", "Branding", "Diseño web", "Motion graphics", "Diseño de sonido"],
+};
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -12,9 +27,17 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Breadman — Estudio de diseño",
   description:
     "Breadman — estudio de diseño. Identidad, web y motion. Valle del Aconcagua, Chile.",
+  openGraph: {
+    title: "Breadman — Estudio de diseño",
+    description:
+      "Breadman — estudio de diseño. Identidad, web y motion. Valle del Aconcagua, Chile.",
+    url: SITE_URL,
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -26,6 +49,10 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${jetbrainsMono.variable} font-mono antialiased`} style={{ margin: 0 }}>
         {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <Script
           src="//code.tidio.co/wb2r3ql60w1vmk7ghpbeuu8yfpu1b1pu.js"
           strategy="afterInteractive"

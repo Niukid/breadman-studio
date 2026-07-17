@@ -3,8 +3,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import BmLogo from "./BmLogo";
 import BmMark from "./BmMark";
-import useChat from "./useChat";
-import { ChatFab, ChatPanel } from "./Chat";
 import CaseAudio from "./CaseAudio";
 import CaseVideo from "./CaseVideo";
 import CaseLinkButton from "./CaseLinkButton";
@@ -114,7 +112,6 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
   const [caseIdx, setCaseIdx] = useState(0);
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
-  const chat = useChat();
 
   const lockUntil = useRef(0);
   const scrollers = useRef<Record<number, HTMLDivElement | null>>({});
@@ -150,7 +147,7 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
   const scroller = () => scrollers.current[cur] || null;
 
   const gesture = (dir: number, mag: number) => {
-    if (menu || caseOpen || chat.open) return;
+    if (menu || caseOpen) return;
     if (Date.now() < lockUntil.current) return;
     if (mag < 40) return;
     const min = visited ? 1 : 0;
@@ -174,7 +171,7 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
       touchT.current = Date.now();
     };
     const onTM = (e: TouchEvent) => {
-      if (touchY.current == null || menu || caseOpen || chat.open) return;
+      if (touchY.current == null || menu || caseOpen) return;
       const dy = touchY.current - e.touches[0].clientY;
       const sc = scroller();
       // At a section boundary (nothing left to scroll in that direction),
@@ -204,7 +201,7 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
       window.removeEventListener("touchend", onTE);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cur, menu, caseOpen, chat.open, visited]);
+  }, [cur, menu, caseOpen, visited]);
 
   const menuGo = (i: number) => {
     setMenu(false);
@@ -224,8 +221,6 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
     setCaseOpen(false);
   };
 
-  const chatAccent = caseOpen ? "#C9D6DE" : SECTION_ACCENT[cur] || "#899EAA";
-  const chatFabShow = cur !== 0 && !menu && !caseOpen;
   const stripesOpacity = cur === 0 || cur === 5 ? 0 : 1;
 
   const submitContact = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -498,18 +493,6 @@ export default function Mobile({ cases }: { cases: SiteCase[] }) {
           </nav>
         </div>
       </div>
-
-      {/* ASISTENTE / CHAT */}
-      <ChatFab
-        accent={chatAccent}
-        show={chatFabShow}
-        onClick={chat.toggle}
-        className="fixed z-[350] w-[58px] h-[58px]"
-        style={{ right: 20, bottom: 24 }}
-      />
-      <div className="fixed z-[360] pointer-events-none" style={{ left: 12, right: 12, top: 70, bottom: 12 }}>
-        <ChatPanel chat={chat} accent={chatAccent} className="w-full h-full" />
-      </div>
     </div>
   );
 }
@@ -521,6 +504,8 @@ function MobileCaseCard({ c, onOpen }: { c: SiteCase; onOpen: () => void }) {
       onClick={onOpen}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
+      role="img"
+      aria-label={c.imageAlt || c.title}
       className="rounded-[10px] flex flex-col justify-end p-6 cursor-pointer"
       style={{
         backgroundColor: "#263038",
@@ -619,7 +604,7 @@ function MobileCaseOverlay({
           d.bgImageMobileUrl && (
             <img
               src={d.bgImageMobileUrl}
-              alt=""
+              alt={d.bgImageMobileAlt || d.title}
               className="absolute inset-0 w-full h-full object-cover"
               style={{ filter: "brightness(.8)" }}
             />
