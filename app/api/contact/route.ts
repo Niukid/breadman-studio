@@ -24,7 +24,7 @@ async function sendContactEmail({
   });
 
   await transporter.sendMail({
-    from: process.env.ICLOUD_EMAIL,
+    from: "Breadman Studio <contacto@breadman.studio>",
     to: process.env.CONTACT_EMAIL_TO,
     replyTo: email,
     subject: `Nuevo mensaje de contacto — ${name}`,
