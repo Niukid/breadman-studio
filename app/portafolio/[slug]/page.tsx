@@ -9,6 +9,7 @@ import BmLogo from "@/components/site/BmLogo";
 import CaseVideo from "@/components/site/CaseVideo";
 import CaseAudio from "@/components/site/CaseAudio";
 import CaseLinkButton from "@/components/site/CaseLinkButton";
+import ShareButton from "@/components/site/ShareButton";
 
 export const revalidate = 60;
 
@@ -61,6 +62,7 @@ export default async function CaseDetailPage({ params }: { params: { slug: strin
   const c = await getCaseBySlug(params.slug);
   if (!c) notFound();
 
+  const pageUrl = `${SITE_URL}/portafolio/${params.slug}`;
   const tags: string[] = c.tags || [];
   const bgUrl = c.backgroundDesktop
     ? urlFor(c.backgroundDesktop).width(1600).url()
@@ -138,12 +140,13 @@ export default async function CaseDetailPage({ params }: { params: { slug: strin
           </div>
         )}
 
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="flex flex-wrap items-center gap-6">
           {c.externalUrl && (
             <CaseLinkButton href={c.externalUrl} variant="desktop">
               Ver sitio ↗
             </CaseLinkButton>
           )}
+          <ShareButton title={c.title} text={c.summary || ""} url={pageUrl} color="#C9D6DE" />
           <Link
             href="/#portafolio"
             className="inline-flex items-center font-bold"
