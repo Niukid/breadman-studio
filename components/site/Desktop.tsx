@@ -6,8 +6,10 @@ import useHover from "./useHover";
 import CaseAudio from "./CaseAudio";
 import CaseVideo from "./CaseVideo";
 import CaseLinkButton from "./CaseLinkButton";
+import ShareButton from "./ShareButton";
 import SocialLinks from "./SocialLinks";
 import type { SiteCase } from "./caseData";
+import { SITE_URL } from "@/lib/site";
 
 const NAV_LINKS = [
   { sec: 1, label: "Home" },
@@ -602,20 +604,26 @@ function CaseOverlay({
                 <CaseAudio audioFileUrl={d.audioFileUrl} audioEmbedUrl={d.audioEmbedUrl} accent="#C9D6DE" variant="desktop" />
               </div>
             )}
-            {((d.videoFileUrl || d.videoUrl) || d.url) && (
-              <div className="flex items-center flex-wrap gap-4">
-                {(d.videoFileUrl || d.videoUrl) && (
-                  <CaseLinkButton onClick={() => setVideoOpen(true)} variant="desktop">
-                    Ver video ▶
-                  </CaseLinkButton>
-                )}
-                {d.url && (
-                  <CaseLinkButton href={d.url} variant="desktop">
-                    Visitar Sitio ↗
-                  </CaseLinkButton>
-                )}
-              </div>
-            )}
+            <div className="flex items-center flex-wrap gap-5">
+              {(d.videoFileUrl || d.videoUrl) && (
+                <CaseLinkButton onClick={() => setVideoOpen(true)} variant="desktop">
+                  Ver video ▶
+                </CaseLinkButton>
+              )}
+              {d.url && (
+                <CaseLinkButton href={d.url} variant="desktop">
+                  Visitar Sitio ↗
+                </CaseLinkButton>
+              )}
+              {d.slug && (
+                <ShareButton
+                  title={d.title}
+                  text={d.desc}
+                  url={`${SITE_URL}/portafolio/${d.slug}`}
+                  color="#C9D6DE"
+                />
+              )}
+            </div>
           </div>
         </div>
         <div className="flex justify-end items-center py-[18px] flex-none" style={{ paddingBottom: 22 }}>

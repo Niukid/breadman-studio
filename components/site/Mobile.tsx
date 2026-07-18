@@ -6,8 +6,10 @@ import BmMark from "./BmMark";
 import CaseAudio from "./CaseAudio";
 import CaseVideo from "./CaseVideo";
 import CaseLinkButton from "./CaseLinkButton";
+import ShareButton from "./ShareButton";
 import SocialLinks from "./SocialLinks";
 import type { SiteCase } from "./caseData";
+import { SITE_URL } from "@/lib/site";
 
 const STRIPE_H = 9;
 const HOME_BG_ANIM = { animation: "bmHomeBg 60s ease-in-out infinite" };
@@ -652,20 +654,27 @@ function MobileCaseOverlay({
               <CaseAudio audioFileUrl={d.audioFileUrl} audioEmbedUrl={d.audioEmbedUrl} accent="#899EAA" variant="mobile" />
             </div>
           )}
-          {((d.videoFileUrl || d.videoUrl) || d.url) && (
-            <div className="flex items-center flex-wrap gap-3">
-              {(d.videoFileUrl || d.videoUrl) && (
-                <CaseLinkButton onClick={() => setVideoOpen(true)} variant="mobile">
-                  Ver video ▶
-                </CaseLinkButton>
-              )}
-              {d.url && (
-                <CaseLinkButton href={d.url} variant="mobile">
-                  Visitar Sitio
-                </CaseLinkButton>
-              )}
-            </div>
-          )}
+          <div className="flex items-center flex-wrap gap-4">
+            {(d.videoFileUrl || d.videoUrl) && (
+              <CaseLinkButton onClick={() => setVideoOpen(true)} variant="mobile">
+                Ver video ▶
+              </CaseLinkButton>
+            )}
+            {d.url && (
+              <CaseLinkButton href={d.url} variant="mobile">
+                Visitar Sitio
+              </CaseLinkButton>
+            )}
+            {d.slug && (
+              <ShareButton
+                title={d.title}
+                text={d.desc}
+                url={`${SITE_URL}/portafolio/${d.slug}`}
+                color="#899EAA"
+                size={16}
+              />
+            )}
+          </div>
         </div>
         <div className="flex justify-between mt-11">
           <button onClick={onPrev} className="bg-transparent border-none font-bold text-[13px] cursor-pointer p-0" style={{ color: "#B7D0DE" }}>
