@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/react";
 import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -57,6 +58,7 @@ export default function RootLayout({
           src="//code.tidio.co/wb2r3ql60w1vmk7ghpbeuu8yfpu1b1pu.js"
           strategy="afterInteractive"
         />
+        <Analytics />
       </body>
     </html>
   );
