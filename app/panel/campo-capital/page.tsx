@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifySessionToken, COOKIE_NAME } from "@/lib/panel-auth";
-import { getN8nStatus, getMetaAdsStatus } from "@/lib/panel-data";
+import { getN8nStatus, getMetaAdsStatus, getLeadsStatus } from "@/lib/panel-data";
 import LogoutButton from "./logout-button";
 
 export const dynamic = "force-dynamic";
@@ -19,9 +19,10 @@ export default async function CampoCapitalPanel() {
   const token = cookieStore.get(COOKIE_NAME)?.value;
   const username = await verifySessionToken(token);
 
-  const [n8nStatus, metaStatus] = await Promise.all([
+  const [n8nStatus, metaStatus, leadsStatus] = await Promise.all([
     getN8nStatus(),
     getMetaAdsStatus(),
+    getLeadsStatus(),
   ]);
 
   return (
@@ -116,10 +117,68 @@ export default async function CampoCapitalPanel() {
             ))}
         </section>
 
+        {/* Leads (Google Sheets) */}
+        <section className="mb-8 border border-white/10 rounded-lg p-6">
+          <h2 className="text-lg font-medium mb-4">
+            Ventas Compradores (leads en planilla)
+          </h2>
+
+          {!leadsStatus.configured && (
+            <p className="text-sm opacity-60">
+              <StatusDot color="#7a7a7a" />
+              Todavía no conectado — falta configurar GOOGLE_SHEETS_API_KEY y
+              LEADS_SHEET_ID.
+            </p>
+          )}
+
+          {leadsStatus.configured && leadsStatus.error && (
+            <p className="text-sm" style={{ color: "#BA5130" }}>
+              Error al consultar la planilla: {leadsStatus.error}
+            </p>
+          )}
+
+          {leadsStatus.configured && !leadsStatus.error && (
+            <>
+              <p className="text-sm opacity-70 mb-4">
+                <StatusDot color={leadsStatus.total > 0 ? "#4a7a5a" : "#7a7a7a"} />
+                {leadsStatus.total} leads registrados en total
+              </p>
+
+              {leadsStatus.total === 0 && (
+                <p className="text-sm opacity-60">
+                  Conectado, sin leads todavía.
+                </p>
+              )}
+
+              {leadsStatus.byStage.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Por etapa</p>
+                  {leadsStatus.byStage.map((s) => (
+                    <p key={s.stage} className="text-sm opacity-70">
+                      {s.stage}: {s.count}
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {leadsStatus.byClass.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Por clase</p>
+                  {leadsStatus.byClass.map((c) => (
+                    <p key={c.clase} className="text-sm opacity-70">
+                      {c.clase}: {c.count}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </section>
+
         {/* Próximamente */}
         <section className="border border-white/10 rounded-lg p-6 opacity-50">
           <h2 className="text-lg font-medium mb-2">Próximamente</h2>
-          <p className="text-sm">WhatsApp · Kommo CRM</p>
+          <p className="text-sm">WhatsApp en vivo · Instagram Claroscuro · Kommo CRM</p>
         </section>
       </div>
     </div>
