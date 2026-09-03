@@ -22,6 +22,14 @@ export type MetaAdsStatus = {
   }[];
 };
 
+export type LeadsStatus = {
+  configured: boolean;
+  error?: string;
+  total: number;
+  byStage: { stage: string; count: number }[];
+  byClass: { clase: string; count: number }[];
+};
+
 const N8N_WORKFLOWS: { id: string; label: string }[] = [
   { id: "2QNKjoQ2JfYQkT5b", label: "Campo Capital WA" },
 ];
@@ -106,6 +114,71 @@ export async function getMetaAdsStatus(): Promise<MetaAdsStatus> {
       configured: true,
       error: err instanceof Error ? err.message : "Error desconocido",
       campaigns: [],
+    };
+  }
+}
+
+export async function getLeadsStatus(): Promise<LeadsStatus> {
+  const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
+  const sheetId = process.env.LEADS_SHEET_ID;
+
+  if (!apiKey || !sheetId) {
+    return { configured: false, total: 0, byStage: [], byClass: [] };
+  }
+
+  try {
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A:L?key=${apiKey}`,
+      { cache: "no-store" }
+    );
+    if (!res.ok) {
+      const body = await res.text();
+      return {
+        configured: true,
+        error: body,
+        total: 0,
+        byStage: [],
+        byClass: [],
+      };
+    }
+    const data = await res.json();
+    const rows = (data.values || []) as string[][];
+    const [header, ...leads] = rows;
+    if (!header) {
+      return { configured: true, total: 0, byStage: [], byClass: [] };
+    }
+    const stageIdx = header.indexOf("etapa");
+    const classIdx = header.indexOf("clase_lead");
+
+    const stageCounts = new Map<string, number>();
+    const classCounts = new Map<string, number>();
+
+    for (const row of leads) {
+      const stage = (row[stageIdx] || "").trim() || "Sin etapa";
+      const clase = (row[classIdx] || "").trim() || "Sin clase";
+      stageCounts.set(stage, (stageCounts.get(stage) || 0) + 1);
+      classCounts.set(clase, (classCounts.get(clase) || 0) + 1);
+    }
+
+    return {
+      configured: true,
+      total: leads.length,
+      byStage: Array.from(stageCounts, ([stage, count]) => ({
+        stage,
+        count,
+      })),
+      byClass: Array.from(classCounts, ([clase, count]) => ({
+        clase,
+        count,
+      })),
+    };
+  } catch (err) {
+    return {
+      configured: true,
+      error: err instanceof Error ? err.message : "Error desconocido",
+      total: 0,
+      byStage: [],
+      byClass: [],
     };
   }
 }
