@@ -16,7 +16,7 @@ export async function GET() {
     const sheets = google.sheets({ version: 'v4', auth });
 
     // ID de la hoja de cálculo (lo encuentras en la URL de tu Google Sheet)
-    const spreadsheetId = 'TU_SPREADSHEET_ID_AQUI'; 
+    const spreadsheetId = '1AwwzLc8gugZAY-UdzDJBDbURJ0Uy6Ucehf6in-cdPBA'; 
     // Rango o pestaña que deseas consultar
     const range = 'Hoja 1!A1:D10'; 
 
