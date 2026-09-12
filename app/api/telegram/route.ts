@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { Redis } from '@upstash/redis'
+import { google } from 'googleapis'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
@@ -11,6 +12,46 @@ const redis = Redis.fromEnv()
 const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const FER_TELEGRAM_ID = 1796093217
 const MAX_HISTORY = 20
+
+// Documentos de Drive por cliente
+const DRIVE_DOCS = {
+  campo_capital_so: '1w7LhDwbPazHtTKnRjT1HGQo1jcWjBIZHDNMKUs34ExA',
+  campo_capital_manual: '1_yLk12bxdJzvqatgM1IMvFz4Ms_Ivh9yaGGaFlrYCes',
+}
+
+// Lee un doc de Drive con caché de 6 horas en Redis
+async function readDriveDoc(fileId: string): Promise<string> {
+  const cacheKey = `drive:${fileId}`
+  try {
+    const cached = await redis.get<string>(cacheKey)
+    if (cached) {
+      console.log(`[Drive] Desde caché: ${fileId}`)
+      return cached
+    }
+  } catch (e) {
+    console.log('[Drive] Sin caché, leyendo desde Drive')
+  }
+
+  try {
+    const credentials = JSON.parse(process.env.GSPAK as string)
+    const auth = new google.auth.GoogleAuth({
+      credentials,
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+    })
+    const drive = google.drive({ version: 'v3', auth })
+    const response = await drive.files.export({
+      fileId,
+      mimeType: 'text/plain',
+    })
+    const content = response.data as string
+    await redis.set(cacheKey, content, { ex: 21600 }) // 6 horas
+    console.log(`[Drive] Leído y cacheado: ${fileId}`)
+    return content
+  } catch (error) {
+    console.error('[Drive] Error leyendo doc:', error)
+    return ''
+  }
+}
 
 const SYSTEM_PROMPT = `Eres el cerebro central de Breadman Studio, una agencia creativa dirigida por Fernando (Fer) en el Valle del Aconcagua, Chile.
 
@@ -30,7 +71,7 @@ Tu filosofía es la misma de Breadman: menos decoración, más sustancia. Bien h
 - Eres conciso: si algo se puede decir en dos líneas, no usas diez
 
 ## Qué puedes hacer hoy
-Por ahora estás en fase de prueba inicial. Puedes conversar, responder preguntas sobre Breadman Studio y sus proyectos, y ayudar a Fer a pensar y planificar. Las herramientas (diseño, estadísticas, ventas) se conectan en los próximos pasos.
+Puedes conversar, responder preguntas sobre Breadman Studio y sus proyectos, y ayudar a Fer a pensar y planificar. Cuando el contexto del mensaje involucra a Campo Capital, tienes acceso al Sistema Operativo y Manual Maestro de ese cliente cargados como contexto adicional.
 
 ## Regla de aprobación
 Cualquier acción real — precio, compromiso con un cliente, publicación, gasto — la preparas pero no la ejecutas. Siempre pasa por Fer antes de confirmarse.
@@ -66,13 +107,37 @@ export async function POST(req: NextRequest) {
       const stored = await redis.get<Message[]>(historyKey)
       if (stored) history = stored
     } catch (e) {
-      console.log('[Cerebro] Sin historial previo, empezando fresco')
+      console.log('[Cerebro] Sin historial previo')
+    }
+
+    // Detectar si el mensaje involucra a Campo Capital
+    const textLower = userText.toLowerCase()
+    const involvesCampoCapital =
+      textLower.includes('campo capital') ||
+      textLower.includes('parcela') ||
+      textLower.includes('lote') ||
+      textLower.includes('terreno') ||
+      textLower.includes('cc') ||
+      textLower.includes('diseño') ||
+      textLower.includes('paleta') ||
+      textLower.includes('color') ||
+      textLower.includes('tipografía')
+
+    // Cargar contexto de Drive si corresponde
+    let driveContext = ''
+    if (involvesCampoCapital) {
+      console.log('[Cerebro] Cargando contexto Campo Capital desde Drive...')
+      const [so, manual] = await Promise.all([
+        readDriveDoc(DRIVE_DOCS.campo_capital_so),
+        readDriveDoc(DRIVE_DOCS.campo_capital_manual),
+      ])
+      if (so || manual) {
+        driveContext = `\n\n## Contexto Campo Capital (desde Drive)\n\n### Sistema Operativo V2\n${so}\n\n### Manual Maestro V12 (resumen)\n${manual.slice(0, 3000)}`
+      }
     }
 
     // Agregar mensaje del usuario al historial
     history.push({ role: 'user', content: userText })
-
-    // Mantener solo los últimos MAX_HISTORY mensajes
     if (history.length > MAX_HISTORY) {
       history = history.slice(history.length - MAX_HISTORY)
     }
@@ -89,11 +154,11 @@ export async function POST(req: NextRequest) {
       }
     ] : []
 
-    // Llamar a Claude con contexto + historial
+    // Llamar a Claude con contexto de Drive incluido en el system prompt
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + driveContext,
       messages: [...contextMessages, ...history]
     })
 
@@ -101,34 +166,3 @@ export async function POST(req: NextRequest) {
       response.content[0].type === 'text'
         ? response.content[0].text
         : 'Error al procesar la respuesta.'
-
-    // Agregar respuesta del cerebro al historial
-    history.push({ role: 'assistant', content: reply })
-
-    // Guardar historial actualizado en Redis (expira en 24 horas)
-    await redis.set(historyKey, history, { ex: 86400 })
-
-    // Enviar respuesta a Telegram
-    const telegramRes = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: reply,
-          parse_mode: 'Markdown'
-        })
-      }
-    )
-
-    if (!telegramRes.ok) {
-      console.error('[Cerebro] Error enviando a Telegram:', await telegramRes.text())
-    }
-
-    return NextResponse.json({ ok: true })
-  } catch (error) {
-    console.error('[Cerebro] Error:', error)
-    return NextResponse.json({ ok: false }, { status: 500 })
-  }
-}
