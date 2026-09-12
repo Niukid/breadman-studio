@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.125.0",
     "@portabletext/react": "^3.2.4",
     "@sanity/image-url": "^1.0.2",
     "@sanity/orderable-document-list": "^1.2.2",
     "@sanity/vision": "^3.57.0",
     "@vercel/analytics": "^2.0.1",
+    "googleapis": "^144.0.0",
     "lucide-react": "^0.468.0",
     "next": "^14.2.0",
     "next-sanity": "^9.4.0",
@@ -22,8 +24,7 @@
     "react-dom": "^18.3.0",
     "react-icons": "^5.4.0",
     "sanity": "^3.57.0",
-    "styled-components": "^6.1.11",
-    "googleapis": "^144.0.0"
+    "styled-components": "^6.1.11"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
