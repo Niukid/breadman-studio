@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { Redis } from '@upstash/redis'
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY
 })
 
-const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN
+const redis = Redis.fromEnv()
 
-// System prompt base — Capa 1 transversal Breadman Studio
+const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN
+const MAX_HISTORY = 20 // máximo de mensajes a recordar por sesión
+
 const SYSTEM_PROMPT = `Eres el cerebro central de Breadman Studio, una agencia creativa dirigida por Fernando (Fer) en el Valle del Aconcagua, Chile.
 
 ## Quién eres
@@ -34,11 +37,15 @@ Cualquier acción real — precio, compromiso con un cliente, publicación, gast
 ## Contexto actual
 Estás corriendo en Telegram (@breadmanstudio_bot) como canal de prueba. Fer es quien está hablando contigo ahora.`
 
+type Message = {
+  role: 'user' | 'assistant'
+  content: string
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
 
-    // Solo procesar mensajes de texto
     const message = body?.message
     if (!message?.text) {
       return NextResponse.json({ ok: true })
@@ -50,20 +57,42 @@ export async function POST(req: NextRequest) {
 
     console.log(`[Cerebro] Mensaje de ${userName}: ${userText}`)
 
-    // Llamar a Claude
+    // Cargar historial desde Redis
+    const historyKey = `chat:${chatId}:history`
+    let history: Message[] = []
+    try {
+      const stored = await redis.get<Message[]>(historyKey)
+      if (stored) history = stored
+    } catch (e) {
+      console.log('[Cerebro] Sin historial previo, empezando fresco')
+    }
+
+    // Agregar mensaje del usuario al historial
+    history.push({ role: 'user', content: userText })
+
+    // Mantener solo los últimos MAX_HISTORY mensajes
+    if (history.length > MAX_HISTORY) {
+      history = history.slice(history.length - MAX_HISTORY)
+    }
+
+    // Llamar a Claude con el historial completo
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
-      messages: [
-        { role: 'user', content: userText }
-      ]
+      messages: history
     })
 
     const reply =
       response.content[0].type === 'text'
         ? response.content[0].text
         : 'Error al procesar la respuesta.'
+
+    // Agregar respuesta del cerebro al historial
+    history.push({ role: 'assistant', content: reply })
+
+    // Guardar historial actualizado en Redis (expira en 24 horas)
+    await redis.set(historyKey, history, { ex: 86400 })
 
     // Enviar respuesta a Telegram
     const telegramRes = await fetch(
