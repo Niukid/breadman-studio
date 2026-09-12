@@ -14,6 +14,7 @@
     "@sanity/image-url": "^1.0.2",
     "@sanity/orderable-document-list": "^1.2.2",
     "@sanity/vision": "^3.57.0",
+    "@upstash/redis": "^1.38.4",
     "@vercel/analytics": "^2.0.1",
     "googleapis": "^144.0.0",
     "lucide-react": "^0.468.0",
