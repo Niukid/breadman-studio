@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
       messages: [...contextMessages, ...history]
     })
 
-    const reply =
-      response.content[0].type === 'text'
-        ? response.content[0].text
-        : 'Error al procesar la respuesta.'
+const reply =
+  response.content[0].type === 'text'
+    ? response.content[0].text
+    : 'Error procesando la respuesta.'
