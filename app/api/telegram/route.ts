@@ -9,7 +9,8 @@ const anthropic = new Anthropic({
 const redis = Redis.fromEnv()
 
 const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN
-const MAX_HISTORY = 20 // máximo de mensajes a recordar por sesión
+const FER_TELEGRAM_ID = 1796093217
+const MAX_HISTORY = 20
 
 const SYSTEM_PROMPT = `Eres el cerebro central de Breadman Studio, una agencia creativa dirigida por Fernando (Fer) en el Valle del Aconcagua, Chile.
 
@@ -35,7 +36,7 @@ Por ahora estás en fase de prueba inicial. Puedes conversar, responder pregunta
 Cualquier acción real — precio, compromiso con un cliente, publicación, gasto — la preparas pero no la ejecutas. Siempre pasa por Fer antes de confirmarse.
 
 ## Contexto actual
-Estás corriendo en Telegram (@breadmanstudio_bot) como canal de prueba. Fer es quien está hablando contigo ahora.`
+Estás corriendo en Telegram (@breadmanstudio_bot) como canal de prueba.`
 
 type Message = {
   role: 'user' | 'assistant'
@@ -52,10 +53,11 @@ export async function POST(req: NextRequest) {
     }
 
     const chatId = message.chat.id
+    const userId = message.from?.id
     const userText = message.text
-    const userName = message.from?.first_name || 'Usuario'
+    const isFer = userId === FER_TELEGRAM_ID
 
-    console.log(`[Cerebro] Mensaje de ${userName}: ${userText}`)
+    console.log(`[Cerebro] Mensaje de ${message.from?.first_name} (id: ${userId}, esFer: ${isFer}): ${userText}`)
 
     // Cargar historial desde Redis
     const historyKey = `chat:${chatId}:history`
@@ -75,12 +77,24 @@ export async function POST(req: NextRequest) {
       history = history.slice(history.length - MAX_HISTORY)
     }
 
-    // Llamar a Claude con el historial completo
+    // Contexto de identidad según quién escribe
+    const contextMessages: Message[] = isFer ? [
+      {
+        role: 'user',
+        content: `[CONTEXTO INTERNO: quien escribe es Fernando (Fer), el dueño y director de Breadman Studio. Tiene acceso total a todo el sistema.]`
+      },
+      {
+        role: 'assistant',
+        content: `Entendido, hablo con Fer.`
+      }
+    ] : []
+
+    // Llamar a Claude con contexto + historial
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       system: SYSTEM_PROMPT,
-      messages: history
+      messages: [...contextMessages, ...history]
     })
 
     const reply =
