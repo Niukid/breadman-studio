@@ -13,23 +13,21 @@ const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const FER_TELEGRAM_ID = 1796093217
 const MAX_HISTORY = 20
 
-// Documentos de Drive por cliente
 const DRIVE_DOCS = {
   campo_capital_so: '1w7LhDwbPazHtTKnRjT1HGQo1jcWjBIZHDNMKUs34ExA',
   campo_capital_manual: '1_yLk12bxdJzvqatgM1IMvFz4Ms_Ivh9yaGGaFlrYCes',
 }
 
-// Lee un doc de Drive con caché de 6 horas en Redis
 async function readDriveDoc(fileId: string): Promise<string> {
   const cacheKey = `drive:${fileId}`
   try {
     const cached = await redis.get<string>(cacheKey)
     if (cached) {
-      console.log(`[Drive] Desde caché: ${fileId}`)
+      console.log('[Drive] Desde cache: ' + fileId)
       return cached
     }
   } catch (e) {
-    console.log('[Drive] Sin caché, leyendo desde Drive')
+    console.log('[Drive] Sin cache, leyendo desde Drive')
   }
 
   try {
@@ -44,8 +42,8 @@ async function readDriveDoc(fileId: string): Promise<string> {
       mimeType: 'text/plain',
     })
     const content = response.data as string
-    await redis.set(cacheKey, content, { ex: 21600 }) // 6 horas
-    console.log(`[Drive] Leído y cacheado: ${fileId}`)
+    await redis.set(cacheKey, content, { ex: 21600 })
+    console.log('[Drive] Leido y cacheado: ' + fileId)
     return content
   } catch (error) {
     console.error('[Drive] Error leyendo doc:', error)
@@ -55,29 +53,29 @@ async function readDriveDoc(fileId: string): Promise<string> {
 
 const SYSTEM_PROMPT = `Eres el cerebro central de Breadman Studio, una agencia creativa dirigida por Fernando (Fer) en el Valle del Aconcagua, Chile.
 
-## Quién eres
+## Quien eres
 Breadman Studio opera cuatro negocios bajo un mismo techo:
 - La agencia creativa Breadman (clientes externos: Campo Capital, Austral Arquitectura, RQ Medical)
-- Claroscuro Records (sello de música electrónica minimal/techno, propio de Fer)
+- Claroscuro Records (sello de musica electronica minimal/techno, propio de Fer)
 - NIUKID (proyecto musical propio de Fer)
-- Un ecosistema de 12 agentes de IA en construcción para automatizar diseño, ventas y marketing
+- Un ecosistema de 12 agentes de IA en construccion para automatizar diseno, ventas y marketing
 
-Tu filosofía es la misma de Breadman: menos decoración, más sustancia. Bien hecho y a tiempo.
+Tu filosofia es la misma de Breadman: menos decoracion, mas sustancia. Bien hecho y a tiempo.
 
-## Cómo hablas
-- Español neutro chileno, directo y sin relleno
+## Como hablas
+- Espanol neutro chileno, directo y sin relleno
 - Como un colaborador inteligente, no como un bot con comandos
-- Nunca usas voseo (sin "vos", "hacé", "contame")
-- Eres conciso: si algo se puede decir en dos líneas, no usas diez
+- Nunca usas voseo
+- Eres conciso: si algo se puede decir en dos lineas, no usas diez
 
-## Qué puedes hacer hoy
-Puedes conversar, responder preguntas sobre Breadman Studio y sus proyectos, y ayudar a Fer a pensar y planificar. Cuando el contexto del mensaje involucra a Campo Capital, tienes acceso al Sistema Operativo y Manual Maestro de ese cliente cargados como contexto adicional.
+## Que puedes hacer hoy
+Puedes conversar, responder preguntas sobre Breadman Studio y sus proyectos, y ayudar a Fer a pensar y planificar. Cuando el contexto involucra a Campo Capital, tienes acceso al Sistema Operativo y Manual Maestro de ese cliente.
 
-## Regla de aprobación
-Cualquier acción real — precio, compromiso con un cliente, publicación, gasto — la preparas pero no la ejecutas. Siempre pasa por Fer antes de confirmarse.
+## Regla de aprobacion
+Cualquier accion real: precio, compromiso con un cliente, publicacion, gasto, la preparas pero no la ejecutas. Siempre pasa por Fer antes de confirmarse.
 
 ## Contexto actual
-Estás corriendo en Telegram (@breadmanstudio_bot) como canal de prueba.`
+Estas corriendo en Telegram como canal de prueba.`
 
 type Message = {
   role: 'user' | 'assistant'
@@ -98,9 +96,8 @@ export async function POST(req: NextRequest) {
     const userText = message.text
     const isFer = userId === FER_TELEGRAM_ID
 
-    console.log(`[Cerebro] Mensaje de ${message.from?.first_name} (id: ${userId}, esFer: ${isFer}): ${userText}`)
+    console.log('[Cerebro] Mensaje de ' + message.from?.first_name + ' (id: ' + userId + ', esFer: ' + isFer + '): ' + userText)
 
-    // Cargar historial desde Redis
     const historyKey = `chat:${chatId}:history`
     let history: Message[] = []
     try {
@@ -110,20 +107,17 @@ export async function POST(req: NextRequest) {
       console.log('[Cerebro] Sin historial previo')
     }
 
-    // Detectar si el mensaje involucra a Campo Capital
     const textLower = userText.toLowerCase()
     const involvesCampoCapital =
       textLower.includes('campo capital') ||
       textLower.includes('parcela') ||
       textLower.includes('lote') ||
       textLower.includes('terreno') ||
-      textLower.includes('cc') ||
-      textLower.includes('diseño') ||
+      textLower.includes('diseno') ||
       textLower.includes('paleta') ||
       textLower.includes('color') ||
-      textLower.includes('tipografía')
+      textLower.includes('tipografia')
 
-    // Cargar contexto de Drive si corresponde
     let driveContext = ''
     if (involvesCampoCapital) {
       console.log('[Cerebro] Cargando contexto Campo Capital desde Drive...')
@@ -132,29 +126,26 @@ export async function POST(req: NextRequest) {
         readDriveDoc(DRIVE_DOCS.campo_capital_manual),
       ])
       if (so || manual) {
-        driveContext = `\n\n## Contexto Campo Capital (desde Drive)\n\n### Sistema Operativo V2\n${so}\n\n### Manual Maestro V12 (resumen)\n${manual.slice(0, 3000)}`
+        driveContext = '\n\n## Contexto Campo Capital\n\n### Sistema Operativo V2\n' + so + '\n\n### Manual Maestro V12\n' + manual.slice(0, 3000)
       }
     }
 
-    // Agregar mensaje del usuario al historial
     history.push({ role: 'user', content: userText })
     if (history.length > MAX_HISTORY) {
       history = history.slice(history.length - MAX_HISTORY)
     }
 
-    // Contexto de identidad según quién escribe
     const contextMessages: Message[] = isFer ? [
       {
         role: 'user',
-        content: `[CONTEXTO INTERNO: quien escribe es Fernando (Fer), el dueño y director de Breadman Studio. Tiene acceso total a todo el sistema.]`
+        content: '[CONTEXTO INTERNO: quien escribe es Fernando (Fer), el dueno y director de Breadman Studio. Tiene acceso total al sistema.]'
       },
       {
         role: 'assistant',
-        content: `Entendido, hablo con Fer.`
+        content: 'Entendido, hablo con Fer.'
       }
     ] : []
 
-    // Llamar a Claude con contexto de Drive incluido en el system prompt
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
@@ -162,7 +153,31 @@ export async function POST(req: NextRequest) {
       messages: [...contextMessages, ...history]
     })
 
-const reply =
-  response.content[0].type === 'text'
-    ? response.content[0].text
-    : 'Error procesando la respuesta.'
+    const replyText = response.content[0].type === 'text' ? response.content[0].text : 'Error procesando la respuesta.'
+
+    history.push({ role: 'assistant', content: replyText })
+    await redis.set(historyKey, history, { ex: 86400 })
+
+    const telegramRes = await fetch(
+      'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: replyText,
+          parse_mode: 'Markdown'
+        })
+      }
+    )
+
+    if (!telegramRes.ok) {
+      console.error('[Cerebro] Error enviando a Telegram:', await telegramRes.text())
+    }
+
+    return NextResponse.json({ ok: true })
+  } catch (error) {
+    console.error('[Cerebro] Error:', error)
+    return NextResponse.json({ ok: false }, { status: 500 })
+  }
+}
