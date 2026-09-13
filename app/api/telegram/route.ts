@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     let replyText = response.content[0].type === 'text' ? response.content[0].text : 'Error procesando la respuesta.'
 
     // Si hay bloque [GUARDAR], extraerlo y guardarlo en Redis
-    const saveMatch = replyText.match(/\[GUARDAR\]:\s*(.+?)(?:\n|$)/s)
+    const saveMatch = replyText.match(/\[GUARDAR\]:\s*([\s\S]+?)(?:\n|$)/)
     if (saveMatch && isFer) {
       const newInfo = saveMatch[1].trim()
       try {
