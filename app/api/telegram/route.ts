@@ -36,13 +36,14 @@ Paleta: #395D46 (verde principal), #1F3D2E (fondo oscuro), #A68A64 (bronce), #DC
 Tipografia: Outfit ExtraBold (titulos), SemiBold (subtitulos/precios), Regular (cuerpo)
 Regla composicion: Sistema Centrado (cc_logo_principal) o Sistema Izquierda (cc_logo_principal_izq). Nunca mezclar.
 
+## Campo Capital - Proyectos activos
+- Casa Piedra: proyecto en Rinconada de Los Andes, a 50 minutos de Santiago. Es un proyecto de Campo Capital.
+- Bosque Estaquilla: proyecto en Los Muermos, Region de Los Lagos. Es un proyecto de Campo Capital.
+
 ## Campo Capital - Contenido comercial
 
 ### Linea 1 - Venta de parcelas (compradores)
 Precio desde $14.990.000
-Proyectos activos:
-- Casa Piedra: Rinconada de Los Andes, a 50 minutos de Santiago
-- Bosque Estaquilla: Los Muermos, Region de Los Lagos
 Beneficios: credito directo, sin papeleos, entrega inmediata, descuentos en terreno
 Tagline: Invierte en tierra, construye patrimonio
 Superficie tipica: 5.000 m2
@@ -52,25 +53,26 @@ Estado juridico: Rol individual CBR
 Publico: duenos de terrenos rurales que quieren vender
 Oferta: gestion profesional completa, tasacion seria, respaldo legal, sin papeleos
 CTAs: Solicite una evaluacion tecnica, Agende su tasacion, Cuentenos sobre su terreno
-Mensaje central: Vender un terreno rural no es como vender una casa.
 
 ## Motor Grafico - Como pedir un diseno
-Cuando Fer pide un diseno para Campo Capital, recopila estos datos conversando naturalmente:
-1. Linea: venta de parcelas o captacion de propietarios
-2. Proyecto/nombre: ej. Casa Piedra, Bosque Estaquilla
-3. Titulo principal
-4. Bajada o subtitulo
-5. Precio (si aplica)
+Cuando Fer menciona un proyecto de Campo Capital (Casa Piedra, Bosque Estaquilla) o pide un diseno, pieza, flyer o grafica, activa el flujo de diseno.
+
+Recopila estos datos conversando naturalmente:
+1. Proyecto: Casa Piedra o Bosque Estaquilla
+2. Linea: venta de parcelas o captacion de propietarios
+3. Titulo principal (o lo propones tu)
+4. Bajada o subtitulo (o lo propones tu)
+5. Precio
 6. Telefono de contacto
-7. CTA (o lo generas tu)
-8. Foto: terreno_01 a terreno_05 (terreno_03 tiene laguna y cordillera nevada)
+7. CTA (o lo propones tu)
+8. Foto: terreno_01 a terreno_05 (terreno_03 tiene laguna y cordillera nevada, ideal para Casa Piedra)
 9. Estilo: centrado o izquierda
 10. Formato: historia (1080x1920), cuadrado (1080x1080), vertical_completo (1080x1350)
 
-Cuando Fer diga que proponga todo, genera un brief completo con todos los datos y pregunta si genera. Cuando confirme, incluye al final en linea separada:
+Si Fer dice que propongas todo, genera un brief completo con todos los datos y pregunta si confirma. Cuando confirme, incluye al final en linea separada:
 GENERAR_DISENO: {"embudo":"captacion","beneficio":"gestion_administracion","fuenteTexto":"usuario","titulo":"TITULO","bajada":"BAJADA","precio":"PRECIO","telefono1":"","contactoAdicional":"","cta":"CTA","estiloLayout":"izquierda","formato":"historia","foto_elegida":"terreno_03"}
 
-Reemplaza los valores con los datos reales.
+Reemplaza los valores con los datos reales del brief.
 
 ## Guardar info nueva
 Cuando Fer quiera guardar info, ayudalo a ordenarla y al final incluye en linea separada:
@@ -89,8 +91,14 @@ function detectDesignRequest(text: string): boolean {
     lower.includes('pieza') ||
     lower.includes('flyer') ||
     lower.includes('grafica') ||
+    lower.includes('grafico') ||
     lower.includes('genera') ||
-    lower.includes('crear imagen')
+    lower.includes('crear imagen') ||
+    lower.includes('casa piedra') ||
+    lower.includes('bosque estaquilla') ||
+    lower.includes('campo capital') ||
+    lower.includes('parcela') ||
+    lower.includes('terreno')
   )
 }
 
@@ -186,7 +194,7 @@ export async function POST(req: NextRequest) {
     const wantsToSave = isFer && detectSaveIntent(userText)
 
     const designInstruction = wantsDesign
-      ? '\n\nINSTRUCCION: Fer quiere un diseno. Si tiene todos los datos genera el brief completo y pregunta si confirma. Si le falta info pide solo lo que falta. Cuando confirme incluye GENERAR_DISENO: seguido del JSON en una sola linea.'
+      ? '\n\nINSTRUCCION: Fer quiere un diseno para Campo Capital. Si ya tiene suficiente info propone el brief completo y pregunta si confirma. Si falta info pide solo lo que falta. Cuando Fer confirme incluye GENERAR_DISENO: seguido del JSON en una sola linea.'
       : ''
 
     const saveInstruction = wantsToSave
@@ -216,7 +224,6 @@ export async function POST(req: NextRequest) {
 
     const allLines = replyText.split('\n')
 
-    // Guardar info
     const saveIdx = allLines.findIndex(l => l.trim().startsWith('GUARDAR_INFO:'))
     if (saveIdx !== -1 && isFer) {
       const newInfo = allLines[saveIdx].replace('GUARDAR_INFO:', '').trim()
@@ -229,7 +236,6 @@ export async function POST(req: NextRequest) {
       } catch (e) {}
     }
 
-    // Disparar motor grafico
     const designIdx = allLines.findIndex(l => l.trim().startsWith('GENERAR_DISENO:'))
     if (designIdx !== -1 && isFer) {
       const jsonStr = allLines[designIdx].replace('GENERAR_DISENO:', '').trim()
