@@ -14,8 +14,8 @@ const FER_TELEGRAM_ID = 1796093217
 const MAX_HISTORY = 20
 
 const DRIVE_DOCS = {
-  campo_capital_so: '1w7LhDwbPazHtTKnRjT1HGQo1jcWjBIZHDNMKUs34ExA',
-  campo_capital_manual: '1_yLk12bxdJzvqatgM1IMvFz4Ms_Ivh9yaGGaFlrYCes',
+  campo_capital_so: '1fhDeWRzgvjlAxYoyl_Fpjh_unPwitag0CHORjxW3Im0',
+  campo_capital_manual: '1Jrebfq0F8HNSmPi4pMewYu6gszHN5849exRpMCNnQQU',
 }
 
 async function readDriveDoc(fileId: string): Promise<string> {
