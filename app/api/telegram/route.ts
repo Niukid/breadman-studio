@@ -87,7 +87,7 @@ function detectDesignRequest(text: string): boolean {
   const lower = text.toLowerCase()
   return (
     lower.includes('diseno') ||
-    lower.includes('diseño') ||
+    lower.includes('diseÃ±o') ||
     lower.includes('pieza') ||
     lower.includes('flyer') ||
     lower.includes('grafica') ||
@@ -122,7 +122,7 @@ async function sendTelegram(chatId: number, text: string) {
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
+      body: JSON.stringify({ chat_id: chatId, text })
     }
   )
 }
