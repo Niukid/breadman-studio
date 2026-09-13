@@ -33,15 +33,15 @@ Tu filosofia: menos decoracion, mas sustancia. Bien hecho y a tiempo.
 ## Regla de aprobacion
 Cualquier accion real: precio, compromiso con un cliente, publicacion, gasto, la preparas pero no la ejecutas. Siempre pasa por Fer antes de confirmarse.
 
-## Campo Capital — Identidad Visual
+## Campo Capital - Identidad Visual
 
 ### Paleta de colores oficial
-- Verde Bosque Principal: #395D46 — color principal, encabezados, botones primarios
-- Verde Profundo Base: #1F3D2E — fondos oscuros, cierres institucionales
-- Tierra Mineral / Bronce: #A68A64 — acentos, filetes, iconografia
-- Arena Calida: #DCC8A3 — tarjetas secundarias, fondos intermedios
-- Blanco Hueso Neutral: #EDEAE2 — fondo claro principal
-- Terracota Acento: #BA5130 — llamadas a accion, badges, alertas comerciales
+- Verde Bosque Principal: #395D46 - color principal, encabezados, botones primarios
+- Verde Profundo Base: #1F3D2E - fondos oscuros, cierres institucionales
+- Tierra Mineral / Bronce: #A68A64 - acentos, filetes, iconografia
+- Arena Calida: #DCC8A3 - tarjetas secundarias, fondos intermedios
+- Blanco Hueso Neutral: #EDEAE2 - fondo claro principal
+- Terracota Acento: #BA5130 - llamadas a accion, badges, alertas comerciales
 
 ### Tipografia
 - Familia exclusiva: Outfit
@@ -55,10 +55,11 @@ Cualquier accion real: precio, compromiso con un cliente, publicacion, gasto, la
 - Nunca mezclar los dos sistemas
 
 ### Filosofia de marca
-Campo Capital se posiciona como referente en terrenos y parcelas de montana de alta plusvalia. Tres pilares: solidez juridica, conexion con la naturaleza, elegancia patrimonial.
+Campo Capital es referente en terrenos y parcelas de montana de alta plusvalia. Tres pilares: solidez juridica, conexion con la naturaleza, elegancia patrimonial.
 
-## Contexto actual
-Estas corriendo en Telegram como canal de prueba. Fer es el dueno con acceso total.`
+## Guardar informacion nueva
+Cuando Fer te mande info nueva para recordar, ayudalo a ordenarla y al final incluye exactamente:
+GUARDAR_INFO: la informacion ordenada y limpia`
 
 type Message = {
   role: 'user' | 'assistant'
@@ -74,7 +75,6 @@ function detectSaveIntent(text: string): boolean {
     lower.includes('agrega') ||
     lower.includes('actualiza') ||
     lower.includes('nueva info') ||
-    lower.includes('nueva informacion') ||
     lower.includes('para campo capital') ||
     lower.includes('quiero que sepas') ||
     lower.includes('ten en cuenta')
@@ -97,8 +97,7 @@ export async function POST(req: NextRequest) {
 
     console.log('[Cerebro] Mensaje de ' + message.from?.first_name + ' (esFer: ' + isFer + '): ' + userText)
 
-    // Cargar historial
-    const historyKey = `chat:${chatId}:history`
+    const historyKey = 'chat:' + chatId + ':history'
     let history: Message[] = []
     try {
       const stored = await redis.get<Message[]>(historyKey)
@@ -107,19 +106,20 @@ export async function POST(req: NextRequest) {
       console.log('[Cerebro] Sin historial previo')
     }
 
-    // Cargar contexto adicional guardado de Campo Capital
     let extraContext = ''
     try {
       const saved = await redis.get<string>(CC_CONTEXT_KEY)
       if (saved) {
-        extraContext = '\n\n## Informacion adicional Campo Capital (actualizada por Fer)\n' + saved
+        extraContext = '\n\n## Informacion adicional Campo Capital guardada por Fer\n' + saved
       }
     } catch (e) {
-      console.log('[Cerebro] Sin contexto adicional guardado')
+      console.log('[Cerebro] Sin contexto adicional')
     }
 
-    // Detectar si Fer quiere guardar info nueva
     const wantsToSave = isFer && detectSaveIntent(userText)
+    const saveInstruction = wantsToSave
+      ? '\n\nINSTRUCCION: Fer quiere guardar info nueva. Ayudalo a formularla claramente y al final incluye: GUARDAR_INFO: la info limpia y ordenada'
+      : ''
 
     history.push({ role: 'user', content: userText })
     if (history.length > MAX_HISTORY) {
@@ -129,18 +129,13 @@ export async function POST(req: NextRequest) {
     const contextMessages: Message[] = isFer ? [
       {
         role: 'user',
-        content: '[CONTEXTO INTERNO: quien escribe es Fernando (Fer), el dueno y director de Breadman Studio. Tiene acceso total al sistema. Puede guardar informacion nueva para que el cerebro la recuerde permanentemente.]'
+        content: '[CONTEXTO INTERNO: quien escribe es Fernando (Fer), dueno y director de Breadman Studio. Acceso total al sistema.]'
       },
       {
         role: 'assistant',
         content: 'Entendido, hablo con Fer.'
       }
     ] : []
-
-    // Si quiere guardar, el system prompt le indica como proceder
-    const saveInstruction = wantsToSave
-      ? '\n\n## INSTRUCCION ESPECIAL: Fer quiere guardar informacion nueva. Ayudalo a formularla claramente, confirma lo que entendiste, y al final de tu respuesta incluye exactamente este bloque:\n[GUARDAR]: <la informacion limpia y ordenada para guardar>'
-      : ''
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
@@ -149,29 +144,33 @@ export async function POST(req: NextRequest) {
       messages: [...contextMessages, ...history]
     })
 
-    let replyText = response.content[0].type === 'text' ? response.content[0].text : 'Error procesando la respuesta.'
+    let replyText = response.content[0].type === 'text'
+      ? response.content[0].text
+      : 'Error procesando la respuesta.'
 
-    // Si hay bloque [GUARDAR], extraerlo y guardarlo en Redis
-    const saveMatch = replyText.match(/\[GUARDAR\]:\s*([\s\S]+?)(?:\n|$)/)
-    if (saveMatch && isFer) {
-      const newInfo = saveMatch[1].trim()
+    const lines = replyText.split('\n')
+    const saveLineIndex = lines.findIndex(function(line) {
+      return line.trim().startsWith('GUARDAR_INFO:')
+    })
+
+    if (saveLineIndex !== -1 && isFer) {
+      const newInfo = lines[saveLineIndex].replace('GUARDAR_INFO:', '').trim()
       try {
-        const existing = await redis.get<string>(CC_CONTEXT_KEY) || ''
-        const updated = existing
-          ? existing + '\n- ' + newInfo
-          : '- ' + newInfo
-        await redis.set(CC_CONTEXT_KEY, updated) // Sin expiracion
-        console.log('[Cerebro] Info guardada en Redis: ' + newInfo)
-        replyText = replyText.replace(/\[GUARDAR\]:.+/s, '').trim() + '\n\nQuedo guardado.'
+        const existing = await redis.get<string>(CC_CONTEXT_KEY)
+        const updated = existing ? existing + '\n- ' + newInfo : '- ' + newInfo
+        await redis.set(CC_CONTEXT_KEY, updated)
+        console.log('[Cerebro] Info guardada: ' + newInfo)
+        lines.splice(saveLineIndex, 1)
+        replyText = lines.join('\n').trim() + '\n\nQuedo guardado.'
       } catch (e) {
-        console.error('[Cerebro] Error guardando info:', e)
+        console.error('[Cerebro] Error guardando:', e)
       }
     }
 
     history.push({ role: 'assistant', content: replyText })
     await redis.set(historyKey, history, { ex: 86400 })
 
-    const telegramRes = await fetch(
+    await fetch(
       'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage',
       {
         method: 'POST',
@@ -183,10 +182,6 @@ export async function POST(req: NextRequest) {
         })
       }
     )
-
-    if (!telegramRes.ok) {
-      console.error('[Cerebro] Error enviando a Telegram:', await telegramRes.text())
-    }
 
     return NextResponse.json({ ok: true })
   } catch (error) {
