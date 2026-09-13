@@ -1,0 +1,67 @@
+export const runtime = 'nodejs'
+
+import { NextRequest, NextResponse } from 'next/server'
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN_ENGINE
+const REPO_OWNER = 'breadman-studio'
+
+export async function POST(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('x-breadman-key')
+    if (authHeader !== process.env.BREADMAN_INTERNAL_KEY) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    }
+
+    const body = await req.json()
+    const { repo, path, content, message } = body
+
+    if (!repo || !path || !content) {
+      return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
+    }
+
+    const getRes = await fetch(
+      'https://api.github.com/repos/' + REPO_OWNER + '/' + repo + '/contents/' + path,
+      {
+        headers: {
+          Authorization: 'token ' + GITHUB_TOKEN,
+          Accept: 'application/vnd.github.v3+json'
+        }
+      }
+    )
+
+    if (!getRes.ok) {
+      return NextResponse.json({ error: 'Archivo no encontrado' }, { status: 404 })
+    }
+
+    const current = await getRes.json()
+    const sha = current.sha
+    const encoded = Buffer.from(content).toString('base64')
+
+    const updateRes = await fetch(
+      'https://api.github.com/repos/' + REPO_OWNER + '/' + repo + '/contents/' + path,
+      {
+        method: 'PUT',
+        headers: {
+          Authorization: 'token ' + GITHUB_TOKEN,
+          Accept: 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: message || 'update: ' + path,
+          content: encoded,
+          sha
+        })
+      }
+    )
+
+    if (!updateRes.ok) {
+      const err = await updateRes.json()
+      return NextResponse.json({ error: err.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ ok: true, path, repo })
+  } catch (error) {
+    console.error('[github-update] Error:', error)
+    return NextResponse.json({ ok: false }, { status: 500 })
+  }
+}
