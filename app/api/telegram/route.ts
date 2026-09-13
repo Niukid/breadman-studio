@@ -1,3 +1,5 @@
+export const runtime = 'nodejs'
+
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { Redis } from '@upstash/redis'
@@ -65,10 +67,10 @@ Cuando Fer pide un diseno para Campo Capital, recopila estos datos conversando n
 9. Estilo: centrado o izquierda
 10. Formato: historia (1080x1920), cuadrado (1080x1080), vertical_completo (1080x1350)
 
-Cuando tengas todo confirmado por Fer, incluye al final de tu respuesta exactamente esto en una linea separada:
-GENERAR_DISENO: {"embudo":"captacion","beneficio":"gestion_administracion","fuenteTexto":"usuario","titulo":"TITULO","bajada":"BAJADA","precio":"PRECIO","telefono1":"TELEFONO","contactoAdicional":"","cta":"CTA","estiloLayout":"izquierda","formato":"historia","foto_elegida":"terreno_03"}
+Cuando Fer diga que proponga todo, genera un brief completo con todos los datos y pregunta si genera. Cuando confirme, incluye al final en linea separada:
+GENERAR_DISENO: {"embudo":"captacion","beneficio":"gestion_administracion","fuenteTexto":"usuario","titulo":"TITULO","bajada":"BAJADA","precio":"PRECIO","telefono1":"","contactoAdicional":"","cta":"CTA","estiloLayout":"izquierda","formato":"historia","foto_elegida":"terreno_03"}
 
-Reemplaza los valores con los datos reales del brief.
+Reemplaza los valores con los datos reales.
 
 ## Guardar info nueva
 Cuando Fer quiera guardar info, ayudalo a ordenarla y al final incluye en linea separada:
@@ -77,21 +79,6 @@ GUARDAR_INFO: la info limpia y ordenada`
 type Message = {
   role: 'user' | 'assistant'
   content: string
-}
-
-function detectSaveIntent(text: string): boolean {
-  const lower = text.toLowerCase()
-  return (
-    lower.includes('guarda') ||
-    lower.includes('anota') ||
-    lower.includes('registra') ||
-    lower.includes('agrega') ||
-    lower.includes('actualiza') ||
-    lower.includes('nueva info') ||
-    lower.includes('para campo capital') ||
-    lower.includes('quiero que sepas') ||
-    lower.includes('ten en cuenta')
-  )
 }
 
 function detectDesignRequest(text: string): boolean {
@@ -103,7 +90,21 @@ function detectDesignRequest(text: string): boolean {
     lower.includes('flyer') ||
     lower.includes('grafica') ||
     lower.includes('genera') ||
-    lower.includes('crea') && lower.includes('campo capital')
+    lower.includes('crear imagen')
+  )
+}
+
+function detectSaveIntent(text: string): boolean {
+  const lower = text.toLowerCase()
+  return (
+    lower.includes('guarda') ||
+    lower.includes('anota') ||
+    lower.includes('registra') ||
+    lower.includes('agrega') ||
+    lower.includes('actualiza') ||
+    lower.includes('nueva info') ||
+    lower.includes('quiero que sepas') ||
+    lower.includes('ten en cuenta')
   )
 }
 
@@ -181,15 +182,15 @@ export async function POST(req: NextRequest) {
       if (saved) extraContext = '\n\n## Info adicional Campo Capital guardada por Fer\n' + saved
     } catch (e) {}
 
-    const wantsToSave = isFer && detectSaveIntent(userText)
     const wantsDesign = isFer && detectDesignRequest(userText)
-
-    const saveInstruction = wantsToSave
-      ? '\n\nINSTRUCCION: Fer quiere guardar info. Ayudalo y al final incluye en linea separada: GUARDAR_INFO: info ordenada'
-      : ''
+    const wantsToSave = isFer && detectSaveIntent(userText)
 
     const designInstruction = wantsDesign
-      ? '\n\nINSTRUCCION: Fer quiere un diseno. Recopila los datos. Cuando estes listo para generar incluye el JSON del brief en una linea separada empezando con GENERAR_DISENO:'
+      ? '\n\nINSTRUCCION: Fer quiere un diseno. Si tiene todos los datos genera el brief completo y pregunta si confirma. Si le falta info pide solo lo que falta. Cuando confirme incluye GENERAR_DISENO: seguido del JSON en una sola linea.'
+      : ''
+
+    const saveInstruction = wantsToSave
+      ? '\n\nINSTRUCCION: Fer quiere guardar info. Ayudalo y al final incluye GUARDAR_INFO: seguido de la info ordenada.'
       : ''
 
     history.push({ role: 'user', content: userText })
@@ -198,14 +199,14 @@ export async function POST(req: NextRequest) {
     }
 
     const contextMessages: Message[] = isFer ? [
-      { role: 'user', content: '[CONTEXTO INTERNO: es Fer, dueno de Breadman Studio. Acceso total.]' },
+      { role: 'user', content: '[CONTEXTO: es Fer, dueno de Breadman Studio. Acceso total.]' },
       { role: 'assistant', content: 'Entendido, hablo con Fer.' }
     ] : []
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
-      system: SYSTEM_PROMPT + extraContext + saveInstruction + designInstruction,
+      system: SYSTEM_PROMPT + extraContext + designInstruction + saveInstruction,
       messages: [...contextMessages, ...history]
     })
 
@@ -235,16 +236,14 @@ export async function POST(req: NextRequest) {
       allLines.splice(designIdx, 1)
       const cleanReply = allLines.join('\n').trim()
 
-      // Enviar confirmacion primero
       await sendTelegram(chatId, cleanReply)
       await sendTelegram(chatId, 'Generando la pieza... llega en 2-3 minutos.')
 
-      // Disparar motor
       try {
         const brief = JSON.parse(jsonStr)
         const ok = await triggerGraphicEngine(brief)
         if (!ok) {
-          await sendTelegram(chatId, 'Hubo un error con el motor grafico. Revisa GitHub Actions.')
+          await sendTelegram(chatId, 'Error con el motor grafico. Revisa GitHub Actions.')
         }
       } catch (e) {
         await sendTelegram(chatId, 'Error parseando el brief. Intenta de nuevo.')
