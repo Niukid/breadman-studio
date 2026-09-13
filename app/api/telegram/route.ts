@@ -50,25 +50,29 @@ Estado juridico: Rol individual CBR
 Publico: duenos de terrenos rurales que quieren vender
 Oferta: gestion profesional completa, tasacion seria, respaldo legal, sin papeleos
 CTAs: Solicite una evaluacion tecnica, Agende su tasacion, Cuentenos sobre su terreno
-Mensaje central: Vender un terreno rural no es como vender una casa. Conocemos la normativa, los derechos de agua y los plazos reales.
+Mensaje central: Vender un terreno rural no es como vender una casa.
 
 ## Motor Grafico - Como pedir un diseno
 Cuando Fer pide un diseno para Campo Capital, recopila estos datos conversando naturalmente:
 1. Linea: venta de parcelas o captacion de propietarios
 2. Proyecto/nombre: ej. Casa Piedra, Bosque Estaquilla
-3. Titulo principal del diseno
+3. Titulo principal
 4. Bajada o subtitulo
 5. Precio (si aplica)
 6. Telefono de contacto
 7. CTA (o lo generas tu)
-8. Foto del terreno: terreno_01 a terreno_05 (terreno_03 tiene laguna y cordillera nevada)
+8. Foto: terreno_01 a terreno_05 (terreno_03 tiene laguna y cordillera nevada)
 9. Estilo: centrado o izquierda
 10. Formato: historia (1080x1920), cuadrado (1080x1080), vertical_completo (1080x1350)
 
-Cuando tengas todos los datos, confirma el brief con Fer antes de disparar el motor. Al final de tu confirmacion incluye exactamente: GENERAR_DISENO: SI
+Cuando tengas todo confirmado por Fer, incluye al final de tu respuesta exactamente esto en una linea separada:
+GENERAR_DISENO: {"embudo":"captacion","beneficio":"gestion_administracion","fuenteTexto":"usuario","titulo":"TITULO","bajada":"BAJADA","precio":"PRECIO","telefono1":"TELEFONO","contactoAdicional":"","cta":"CTA","estiloLayout":"izquierda","formato":"historia","foto_elegida":"terreno_03"}
+
+Reemplaza los valores con los datos reales del brief.
 
 ## Guardar info nueva
-Cuando Fer quiera guardar info, ayudalo a ordenarla y al final incluye: GUARDAR_INFO: la info limpia`
+Cuando Fer quiera guardar info, ayudalo a ordenarla y al final incluye en linea separada:
+GUARDAR_INFO: la info limpia y ordenada`
 
 type Message = {
   role: 'user' | 'assistant'
@@ -97,19 +101,26 @@ function detectDesignRequest(text: string): boolean {
     lower.includes('diseño') ||
     lower.includes('pieza') ||
     lower.includes('flyer') ||
-    lower.includes('historia') ||
     lower.includes('grafica') ||
-    lower.includes('grafico') ||
-    lower.includes('generar') ||
-    lower.includes('crear imagen') ||
-    lower.includes('campo capital') && (lower.includes('publicidad') || lower.includes('post') || lower.includes('ad'))
+    lower.includes('genera') ||
+    lower.includes('crea') && lower.includes('campo capital')
+  )
+}
+
+async function sendTelegram(chatId: number, text: string) {
+  await fetch(
+    'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'Markdown' })
+    }
   )
 }
 
 async function triggerGraphicEngine(brief: object): Promise<boolean> {
   try {
     const content = Buffer.from(JSON.stringify(brief, null, 2)).toString('base64')
-
     const getRes = await fetch(
       'https://api.github.com/repos/Niukid/breadman-graphic-engine/contents/clients/campo-capital/brief.json',
       {
@@ -121,7 +132,6 @@ async function triggerGraphicEngine(brief: object): Promise<boolean> {
     )
     const current = await getRes.json()
     const sha = current.sha
-
     const updateRes = await fetch(
       'https://api.github.com/repos/Niukid/breadman-graphic-engine/contents/clients/campo-capital/brief.json',
       {
@@ -138,10 +148,9 @@ async function triggerGraphicEngine(brief: object): Promise<boolean> {
         })
       }
     )
-
     return updateRes.ok
   } catch (error) {
-    console.error('[Agente11] Error disparando motor:', error)
+    console.error('[Agente11] Error:', error)
     return false
   }
 }
@@ -149,7 +158,6 @@ async function triggerGraphicEngine(brief: object): Promise<boolean> {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-
     const message = body?.message
     if (!message?.text) {
       return NextResponse.json({ ok: true })
@@ -160,16 +168,12 @@ export async function POST(req: NextRequest) {
     const userText = message.text
     const isFer = userId === FER_TELEGRAM_ID
 
-    console.log('[Cerebro] ' + message.from?.first_name + ' (esFer:' + isFer + '): ' + userText)
-
     const historyKey = 'chat:' + chatId + ':history'
     let history: Message[] = []
     try {
       const stored = await redis.get<Message[]>(historyKey)
       if (stored) history = stored
-    } catch (e) {
-      console.log('[Cerebro] Sin historial')
-    }
+    } catch (e) {}
 
     let extraContext = ''
     try {
@@ -181,11 +185,11 @@ export async function POST(req: NextRequest) {
     const wantsDesign = isFer && detectDesignRequest(userText)
 
     const saveInstruction = wantsToSave
-      ? '\n\nINSTRUCCION: Fer quiere guardar info. Ayudalo a formularla y al final incluye: GUARDAR_INFO: la info ordenada'
+      ? '\n\nINSTRUCCION: Fer quiere guardar info. Ayudalo y al final incluye en linea separada: GUARDAR_INFO: info ordenada'
       : ''
 
     const designInstruction = wantsDesign
-      ? '\n\nINSTRUCCION: Fer quiere un diseno para Campo Capital. Recopila los datos necesarios conversando naturalmente. Cuando tengas todo confirmado incluye: GENERAR_DISENO: SI'
+      ? '\n\nINSTRUCCION: Fer quiere un diseno. Recopila los datos. Cuando estes listo para generar incluye el JSON del brief en una linea separada empezando con GENERAR_DISENO:'
       : ''
 
     history.push({ role: 'user', content: userText })
@@ -194,14 +198,8 @@ export async function POST(req: NextRequest) {
     }
 
     const contextMessages: Message[] = isFer ? [
-      {
-        role: 'user',
-        content: '[CONTEXTO INTERNO: es Fer, dueno y director de Breadman Studio. Acceso total.]'
-      },
-      {
-        role: 'assistant',
-        content: 'Entendido, hablo con Fer.'
-      }
+      { role: 'user', content: '[CONTEXTO INTERNO: es Fer, dueno de Breadman Studio. Acceso total.]' },
+      { role: 'assistant', content: 'Entendido, hablo con Fer.' }
     ] : []
 
     const response = await anthropic.messages.create({
@@ -213,68 +211,53 @@ export async function POST(req: NextRequest) {
 
     let replyText = response.content[0].type === 'text'
       ? response.content[0].text
-      : 'Error procesando la respuesta.'
+      : 'Error procesando.'
 
-    // Guardar info nueva
-    const lines = replyText.split('\n')
-    const saveLineIndex = lines.findIndex(function(line) {
-      return line.trim().startsWith('GUARDAR_INFO:')
-    })
-    if (saveLineIndex !== -1 && isFer) {
-      const newInfo = lines[saveLineIndex].replace('GUARDAR_INFO:', '').trim()
+    const allLines = replyText.split('\n')
+
+    // Guardar info
+    const saveIdx = allLines.findIndex(l => l.trim().startsWith('GUARDAR_INFO:'))
+    if (saveIdx !== -1 && isFer) {
+      const newInfo = allLines[saveIdx].replace('GUARDAR_INFO:', '').trim()
       try {
         const existing = await redis.get<string>(CC_CONTEXT_KEY)
         const updated = existing ? existing + '\n- ' + newInfo : '- ' + newInfo
         await redis.set(CC_CONTEXT_KEY, updated)
-        lines.splice(saveLineIndex, 1)
-        replyText = lines.join('\n').trim() + '\n\nQuedo guardado.'
+        allLines.splice(saveIdx, 1)
+        replyText = allLines.join('\n').trim() + '\n\nQuedo guardado.'
       } catch (e) {}
     }
 
     // Disparar motor grafico
-    const designLineIndex = lines.findIndex(function(line) {
-      return line.trim().startsWith('GENERAR_DISENO: SI')
-    })
-    if (designLineIndex !== -1 && isFer) {
-      lines.splice(designLineIndex, 1)
-      replyText = lines.join('\n').trim()
+    const designIdx = allLines.findIndex(l => l.trim().startsWith('GENERAR_DISENO:'))
+    if (designIdx !== -1 && isFer) {
+      const jsonStr = allLines[designIdx].replace('GENERAR_DISENO:', '').trim()
+      allLines.splice(designIdx, 1)
+      const cleanReply = allLines.join('\n').trim()
 
-      const brief = {
-        embudo: 'captacion',
-        beneficio: 'gestion_administracion',
-        fuenteTexto: 'usuario',
-        titulo: '',
-        bajada: '',
-        telefono1: '',
-        contactoAdicional: '',
-        cta: '',
-        estiloLayout: 'izquierda',
-        formato: 'historia'
+      // Enviar confirmacion primero
+      await sendTelegram(chatId, cleanReply)
+      await sendTelegram(chatId, 'Generando la pieza... llega en 2-3 minutos.')
+
+      // Disparar motor
+      try {
+        const brief = JSON.parse(jsonStr)
+        const ok = await triggerGraphicEngine(brief)
+        if (!ok) {
+          await sendTelegram(chatId, 'Hubo un error con el motor grafico. Revisa GitHub Actions.')
+        }
+      } catch (e) {
+        await sendTelegram(chatId, 'Error parseando el brief. Intenta de nuevo.')
       }
 
-      const ok = await triggerGraphicEngine(brief)
-      if (ok) {
-        replyText += '\n\nMotor grafico disparado. La imagen llega en unos minutos por aca.'
-      } else {
-        replyText += '\n\nHubo un error disparando el motor. Revisa GitHub Actions.'
-      }
+      history.push({ role: 'assistant', content: cleanReply })
+      await redis.set(historyKey, history, { ex: 86400 })
+      return NextResponse.json({ ok: true })
     }
 
     history.push({ role: 'assistant', content: replyText })
     await redis.set(historyKey, history, { ex: 86400 })
-
-    await fetch(
-      'https://api.telegram.org/bot' + TELEGRAM_TOKEN + '/sendMessage',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: replyText,
-          parse_mode: 'Markdown'
-        })
-      }
-    )
+    await sendTelegram(chatId, replyText)
 
     return NextResponse.json({ ok: true })
   } catch (error) {
