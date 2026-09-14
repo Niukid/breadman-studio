@@ -26,10 +26,10 @@ const AGENTS = [
 ]
 
 const ACTIVITY = [
-  { label:'Pieza generada — Campo Capital', time:'hace 2h', color:T.cc },
-  { label:'Lead nuevo — Campo Capital', time:'hace 3h', color:T.cc },
-  { label:'Venta — Claroscuro Records', time:'hace 5h', color:T.claroscuro },
-  { label:'Bot Telegram — respuesta enviada', time:'hace 6h', color:T.breadman },
+  { label:'Pieza generada â Campo Capital', time:'hace 2h', color:T.cc },
+  { label:'Lead nuevo â Campo Capital', time:'hace 3h', color:T.cc },
+  { label:'Venta â Claroscuro Records', time:'hace 5h', color:T.claroscuro },
+  { label:'Bot Telegram â respuesta enviada', time:'hace 6h', color:T.breadman },
 ]
 
 function Badge({ label, color }: { label:string, color:string }) {
@@ -51,13 +51,13 @@ function MetricCard({ value, label, sub }: { value:string|number, label:string, 
 }
 
 const NAV = [
-  { id:'dashboard', label:'Inicio', icon:'⊞' },
-  { id:'ccsmart', label:'CC Smart', icon:'◉', color:T.cc, badge:'ACTIVO', route:'/panel/ccsmart' },
-  { id:'claroscuro', label:'Claroscuro', icon:'◉', color:T.claroscuro, badge:'ACTIVO' },
-  { id:'austral', label:'Austral', icon:'○', color:T.textDim, badge:'PRONTO' },
-  { id:'agentes', label:'Agentes', icon:'⬡', sub:'1/12' },
-  { id:'disenos', label:'Disenos', icon:'◈' },
-  { id:'config', label:'Config', icon:'⊙' },
+  { id:'dashboard', label:'Inicio', icon:'â' },
+  { id:'ccsmart', label:'CC Smart', icon:'â', color:T.cc, badge:'ACTIVO', route:'/panel/ccsmart' },
+  { id:'claroscuro', label:'Claroscuro', icon:'â', color:T.claroscuro, badge:'ACTIVO' },
+  { id:'austral', label:'Austral', icon:'â', color:T.textDim, badge:'PRONTO' },
+  { id:'agentes', label:'Agentes', icon:'â¬¡', sub:'1/12' },
+  { id:'disenos', label:'Disenos', icon:'â' },
+  { id:'config', label:'Config', icon:'â' },
 ]
 
 export default function PanelMaestro() {
@@ -173,7 +173,7 @@ export default function PanelMaestro() {
 
           <div style={{ marginBottom:'20px' }}>
             <div style={{ fontSize:'18px', fontWeight:700 }}>Dashboard</div>
-            <div style={{ fontSize:'12px', color:T.textMuted, marginTop:'2px' }}>Vision general — Breadman Studio</div>
+            <div style={{ fontSize:'12px', color:T.textMuted, marginTop:'2px' }}>Vision general â Breadman Studio</div>
           </div>
 
           {/* CLIENTES */}
@@ -202,7 +202,7 @@ export default function PanelMaestro() {
                 <span style={{ fontSize:'11px', color:T.textDim }}>Ultima pieza: hace 2h</span>
                 <button onClick={() => router.push('/panel/ccsmart')}
                   style={{ background:'none', border:'1px solid '+T.cc+'60', color:T.cc, padding:'4px 12px', borderRadius:'5px', cursor:'pointer', fontSize:'11px', fontFamily:'Outfit, sans-serif', fontWeight:600 }}>
-                  Ver →
+                  Ver â
                 </button>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function PanelMaestro() {
               <div style={{ padding:'10px 16px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                 <span style={{ fontSize:'11px', color:T.textDim }}>Bandcamp + Instagram</span>
                 <button style={{ background:'none', border:'1px solid '+T.claroscuro+'60', color:T.claroscuro, padding:'4px 12px', borderRadius:'5px', cursor:'pointer', fontSize:'11px', fontFamily:'Outfit, sans-serif', fontWeight:600 }}>
-                  Ver →
+                  Ver â
                 </button>
               </div>
             </div>
@@ -282,13 +282,13 @@ export default function PanelMaestro() {
       <style>{
         '@media (max-width: 640px) { #mobile-nav { display: block !important; } }'
       }</style>
-      <div id="mobile-nav" style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, height:'60px', backgroundColor:T.surface, borderTop:'1px solid '+T.border, display:'flex', alignItems:'center', justifyContent:'space-around', zIndex:50 }}>
+      <div id="mobile-nav" style={{ position:'fixed', bottom:0, left:0, right:0, height:'60px', backgroundColor:T.surface, borderTop:'1px solid '+T.border, display:'flex', alignItems:'center', justifyContent:'space-around', zIndex:50 }}>
         {[
-          { id:'dashboard', label:'Inicio', icon:'⊞' },
-          { id:'ccsmart', label:'CC Smart', icon:'◉', color:T.cc, route:'/panel/ccsmart' },
-          { id:'claroscuro', label:'Claroscuro', icon:'◉', color:T.claroscuro },
-          { id:'agentes', label:'Agentes', icon:'⬡' },
-          { id:'config', label:'Config', icon:'⊙' },
+          { id:'dashboard', label:'Inicio', icon:'â' },
+          { id:'ccsmart', label:'CC Smart', icon:'â', color:T.cc, route:'/panel/ccsmart' },
+          { id:'claroscuro', label:'Claroscuro', icon:'â', color:T.claroscuro },
+          { id:'agentes', label:'Agentes', icon:'â¬¡' },
+          { id:'config', label:'Config', icon:'â' },
         ].map(item => (
           <button key={item.id} onClick={() => item.route ? router.push(item.route) : setSeccion(item.id)}
             style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'3px', background:'none', border:'none', cursor:'pointer', padding:'8px 12px', flex:1, fontFamily:'Outfit, sans-serif' }}>
