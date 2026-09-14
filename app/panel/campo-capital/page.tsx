@@ -1,1 +1,186 @@
-READ_ONLY
+import { cookies } from "next/headers";
+import { verifySessionToken, COOKIE_NAME } from "@/lib/panel-auth";
+import { getN8nStatus, getMetaAdsStatus, getLeadsStatus } from "@/lib/panel-data";
+import LogoutButton from "./logout-button";
+
+export const dynamic = "force-dynamic";
+
+function StatusDot({ color }: { color: string }) {
+  return (
+    <span
+      className="inline-block w-2 h-2 rounded-full mr-2"
+      style={{ background: color }}
+    />
+  );
+}
+
+export default async function CampoCapitalPanel() {
+  const cookieStore = cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const username = await verifySessionToken(token);
+
+  const [n8nStatus, metaStatus, leadsStatus] = await Promise.all([
+    getN8nStatus(),
+    getMetaAdsStatus(),
+    getLeadsStatus(),
+  ]);
+
+  return (
+    <div
+      className="min-h-screen px-6 py-10"
+      style={{ background: "#101010", color: "#EDEAE2" }}
+    >
+      <div className="max-w-3xl mx-auto">
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-2xl font-medium">Campo Capital</h1>
+          <LogoutButton />
+        </div>
+        <p className="text-sm opacity-60 mb-10">
+          Panel de estado Â· sesiÃ³n: {username}
+        </p>
+
+        {/* DirecciÃ³n de Arte / n8n */}
+        <section className="mb-8 border border-white/10 rounded-lg p-6">
+          <h2 className="text-lg font-medium mb-4">
+            DirecciÃ³n de Arte (bot de diseÃ±o)
+          </h2>
+
+          {!n8nStatus.configured && (
+            <p className="text-sm opacity-60">
+              <StatusDot color="#7a7a7a" />
+              TodavÃ­a no conectado â falta configurar N8N_BASE_URL y
+              N8N_API_KEY.
+            </p>
+          )}
+
+          {n8nStatus.configured && n8nStatus.error && (
+            <p className="text-sm" style={{ color: "#BA5130" }}>
+              Error al consultar n8n: {n8nStatus.error}
+            </p>
+          )}
+
+          {n8nStatus.configured &&
+            !n8nStatus.error &&
+            n8nStatus.workflows.map((wf) => (
+              <div key={wf.name} className="mb-4 last:mb-0">
+                <p className="text-sm font-medium mb-1">{wf.name}</p>
+                <p className="text-sm opacity-70">
+                  <StatusDot
+                    color={wf.failedRecent > 0 ? "#BA5130" : "#4a7a5a"}
+                  />
+                  {wf.totalRecent} ejecuciones recientes
+                  {wf.failedRecent > 0 &&
+                    ` Â· ${wf.failedRecent} con error`}
+                </p>
+              </div>
+            ))}
+        </section>
+
+        {/* Meta Ads */}
+        <section className="mb-8 border border-white/10 rounded-lg p-6">
+          <h2 className="text-lg font-medium mb-4">Publicidad (Meta Ads)</h2>
+
+          {!metaStatus.configured && (
+            <p className="text-sm opacity-60">
+              <StatusDot color="#7a7a7a" />
+              TodavÃ­a no conectado â falta configurar META_ACCESS_TOKEN y
+              META_AD_ACCOUNT_ID.
+            </p>
+          )}
+
+          {metaStatus.configured && metaStatus.error && (
+            <p className="text-sm" style={{ color: "#BA5130" }}>
+              Error al consultar Meta: {metaStatus.error}
+            </p>
+          )}
+
+          {metaStatus.configured &&
+            !metaStatus.error &&
+            metaStatus.campaigns.length === 0 && (
+              <p className="text-sm opacity-60">
+                Conectado, sin campaÃ±as todavÃ­a.
+              </p>
+            )}
+
+          {metaStatus.configured &&
+            !metaStatus.error &&
+            metaStatus.campaigns.map((c) => (
+              <div key={c.name} className="mb-3 last:mb-0">
+                <p className="text-sm font-medium mb-1">{c.name}</p>
+                <p className="text-sm opacity-70">
+                  <StatusDot
+                    color={c.status === "ACTIVE" ? "#4a7a5a" : "#7a7a7a"}
+                  />
+                  {c.status} Â· {c.objective}
+                </p>
+              </div>
+            ))}
+        </section>
+
+        {/* Leads (Google Sheets) */}
+        <section className="mb-8 border border-white/10 rounded-lg p-6">
+          <h2 className="text-lg font-medium mb-4">
+            Ventas Compradores (leads en planilla)
+          </h2>
+
+          {!leadsStatus.configured && (
+            <p className="text-sm opacity-60">
+              <StatusDot color="#7a7a7a" />
+              TodavÃ­a no conectado â falta configurar GOOGLE_SHEETS_API_KEY y
+              LEADS_SHEET_ID.
+            </p>
+          )}
+
+          {leadsStatus.configured && leadsStatus.error && (
+            <p className="text-sm" style={{ color: "#BA5130" }}>
+              Error al consultar la planilla: {leadsStatus.error}
+            </p>
+          )}
+
+          {leadsStatus.configured && !leadsStatus.error && (
+            <>
+              <p className="text-sm opacity-70 mb-4">
+                <StatusDot color={leadsStatus.total > 0 ? "#4a7a5a" : "#7a7a7a"} />
+                {leadsStatus.total} leads registrados en total
+              </p>
+
+              {leadsStatus.total === 0 && (
+                <p className="text-sm opacity-60">
+                  Conectado, sin leads todavÃ­a.
+                </p>
+              )}
+
+              {leadsStatus.byStage.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-medium mb-2">Por etapa</p>
+                  {leadsStatus.byStage.map((s) => (
+                    <p key={s.stage} className="text-sm opacity-70">
+                      {s.stage}: {s.count}
+                    </p>
+                  ))}
+                </div>
+              )}
+
+              {leadsStatus.byClass.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium mb-2">Por clase</p>
+                  {leadsStatus.byClass.map((c) => (
+                    <p key={c.clase} className="text-sm opacity-70">
+                      {c.clase}: {c.count}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </section>
+
+        {/* PrÃ³ximamente */}
+        <section className="border border-white/10 rounded-lg p-6 opacity-50">
+          <h2 className="text-lg font-medium mb-2">PrÃ³ximamente</h2>
+          <p className="text-sm">WhatsApp en vivo Â· Instagram Claroscuro Â· Kommo CRM</p>
+        </section>
+      </div>
+    </div>
+  );
+}
