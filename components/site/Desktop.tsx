@@ -123,6 +123,7 @@ const SERVICES = [
   { title: "Motion graphics", desc: "Piezas en movimiento para redes, web y presentaciones." },
   { title: "Dirección creativa", desc: "La mirada completa: concepto, estética y coherencia de principio a fin." },
   { title: "Diseño sonoro", desc: "Identidad de audio, música para piezas audiovisuales, logo sonoro." },
+  { title: "Automatización con IA", desc: "Desarrollo de flujos de marketing asistidos por inteligencia artificial." },
 ];
 
 export default function Desktop({ cases }: { cases: SiteCase[] }) {
