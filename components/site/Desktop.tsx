@@ -314,7 +314,7 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
         </div>
       </Section>
 
-      {/* 4 · SOBRE BREADMAN */}
+  {/* 4 · SOBRE BREADMAN */}
       <Section active={sec === 4} bg={SECTION_BG[4]}>
         <img
           src="/assets/sobre-fondo.png"
@@ -334,19 +334,17 @@ export default function Desktop({ cases }: { cases: SiteCase[] }) {
               SOBRE BREADMAN
             </h1>
             <p className="max-w-[780px]" style={{ color: "rgba(198,210,219,.92)", fontSize: 16, lineHeight: 1.7, margin: "0 0 22px" }}>
-              Breadman es un estudio de diseño y dirección creativa fundado por Fernando, con base en el Valle del
-              Aconcagua. Trabajamos en identidad visual, branding, web design, motion graphics y sonido — todo
-              integrado como una sola disciplina.
+              Breadman es un estudio de diseño, dirección creativa y automatización fundado por Fernando, con base en el Valle del
+              Aconcagua. Desarrollamos identidad visual, branding, diseño web interactivo, motion graphics, sonido y flujos de marketing asistidos por inteligencia artificial — integrando diseño y tecnología en un solo sistema.
             </p>
             <p className="max-w-[780px]" style={{ color: "rgba(198,210,219,.92)", fontSize: 16, lineHeight: 1.7 }}>
-              Venimos de años de trabajo en sectores distintos: arquitectura, salud, finanzas y cultura. Creemos que
-              las marcas fuertes se construyen con método, criterio y las manos en el barro. Sin sobreproducciones,
-              sin jerga. Bien hechas y a tiempo.
+              Venimos de años de trabajo en sectores clave: arquitectura, salud, finanzas, bienes raíces y cultura. Construimos marcas sólidas y herramientas operativas con método, precisión técnica y criterio estético. Sin sobreproducciones, sin jerga. Soluciones bien hechas, escalables y a tiempo.
             </p>
           </div>
         </div>
       </Section>
 
+      
       {/* 5 · CONTACTO */}
       <Section active={sec === 5} bg={SECTION_BG[5]}>
         <div className="w-full h-full flex flex-col" style={{ maxHeight: 800, margin: "auto" }}>
